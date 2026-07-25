@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Gregs_Auto.DAL.Context;
+using Gregs_Auto.DAL.Repositories;
+using Gregs_Auto.Domain.IRepositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +13,16 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<GregsAutoContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("GregsAutoContext")));
 
-// Repositories and logic-layer services get registered here as they're added,
-// e.g. builder.Services.AddScoped<IFooRepository, FooRepository>();
+// Repositories: bind each interface to its implementation.
+// Scoped = one instance per web request.
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// Logic-layer services get registered here as they're added,
+// e.g. builder.Services.AddScoped<IFooLogic, FooLogic>();
 
 var app = builder.Build();
 
