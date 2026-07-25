@@ -60,4 +60,40 @@ public class AppointmentLogic : IAppointmentLogic
 
         return AppointmentResult.Ok(appointment.AppointmentId);
     }
+
+    public async Task StartAsync(int appointmentId)
+    {
+        var appointment = await _appointmentRepository.GetAsync(a => a.AppointmentId == appointmentId);
+
+        // Business rule: only a Scheduled appointment can move to InProgress.
+        if (appointment == null || appointment.Status != "Scheduled")
+            return;
+
+        appointment.Status = "InProgress";
+        await _appointmentRepository.SaveChangesAsync();
+    }
+
+    public async Task CompleteAsync(int appointmentId)
+    {
+        var appointment = await _appointmentRepository.GetAsync(a => a.AppointmentId == appointmentId);
+
+        // Business rule: a Completed or Cancelled appointment can't be completed again.
+        if (appointment == null || appointment.Status is "Completed" or "Cancelled")
+            return;
+
+        appointment.Status = "Completed";
+        await _appointmentRepository.SaveChangesAsync();
+    }
+
+    public async Task CancelAsync(int appointmentId)
+    {
+        var appointment = await _appointmentRepository.GetAsync(a => a.AppointmentId == appointmentId);
+
+        // Business rule: a Completed or already-Cancelled appointment can't be cancelled.
+        if (appointment == null || appointment.Status is "Completed" or "Cancelled")
+            return;
+
+        appointment.Status = "Cancelled";
+        await _appointmentRepository.SaveChangesAsync();
+    }
 }

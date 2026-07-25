@@ -11,4 +11,13 @@ public interface IAppointmentLogic
     // Book a new appointment. Validates the vehicle and service exist and that
     // the slot isn't already taken before creating anything.
     Task<AppointmentResult> BookAsync(int vehicleId, int serviceId, DateTime scheduledAt, string? notes);
+
+    // Scheduled -> InProgress. No-ops if the appointment isn't Scheduled.
+    Task StartAsync(int appointmentId);
+
+    // Scheduled/InProgress -> Completed. No-ops otherwise.
+    Task CompleteAsync(int appointmentId);
+
+    // Scheduled/InProgress -> Cancelled. No-ops otherwise.
+    Task CancelAsync(int appointmentId);
 }

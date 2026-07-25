@@ -41,6 +41,53 @@ public class AppointmentsController : Controller
         return RedirectToAction(nameof(Schedule));
     }
 
+    // GET /Appointments/Manage — staff view of every appointment, with status actions.
+    public async Task<IActionResult> Manage()
+    {
+        var appointments = await _appointmentLogic.GetUpcomingAsync();
+        return View(appointments.Select(ToRowViewModel).ToList());
+    }
+
+    // POST /Appointments/Start — Scheduled -> InProgress
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Start(int id)
+    {
+        await _appointmentLogic.StartAsync(id);
+        return RedirectToAction(nameof(Manage));
+    }
+
+    // POST /Appointments/Complete — Scheduled/InProgress -> Completed
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Complete(int id)
+    {
+        await _appointmentLogic.CompleteAsync(id);
+        return RedirectToAction(nameof(Manage));
+    }
+
+    // POST /Appointments/Cancel — Scheduled/InProgress -> Cancelled
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cancel(int id)
+    {
+        await _appointmentLogic.CancelAsync(id);
+        return RedirectToAction(nameof(Manage));
+    }
+
+    private static AppointmentRowViewModel ToRowViewModel(Gregs_Auto.Domain.EntityModels.Appointment a)
+    {
+        return new AppointmentRowViewModel
+        {
+            Id = a.AppointmentId,
+            ScheduledAt = a.ScheduledAt,
+            Status = a.Status,
+            CustomerName = a.Vehicle.Customer.FullName,
+            VehicleDescription = $"{a.Vehicle.Year} {a.Vehicle.Make} {a.Vehicle.Model}",
+            ServiceName = a.Service.Name
+        };
+    }
+
     private async Task<ScheduleAppointmentViewModel> BuildViewModelAsync()
     {
         var vehicles = await _vehicleRepository.GetAllWithCustomerAsync();
@@ -62,15 +109,7 @@ public class AppointmentsController : Controller
                 Price = s.Price,
                 EstimatedDurationMinutes = s.EstimatedDurationMinutes
             }).ToList(),
-            UpcomingAppointments = appointments.Select(a => new AppointmentRowViewModel
-            {
-                Id = a.AppointmentId,
-                ScheduledAt = a.ScheduledAt,
-                Status = a.Status,
-                CustomerName = a.Vehicle.Customer.FullName,
-                VehicleDescription = $"{a.Vehicle.Year} {a.Vehicle.Make} {a.Vehicle.Model}",
-                ServiceName = a.Service.Name
-            }).ToList()
+            UpcomingAppointments = appointments.Select(ToRowViewModel).ToList()
         };
     }
 }
