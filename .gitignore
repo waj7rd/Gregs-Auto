@@ -399,3 +399,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Local-only SQL scripts (schema/seed data, sometimes with credentials or
+# password hashes) — kept out of source control on purpose.
+Gregs Auto.DAL/Scripts/

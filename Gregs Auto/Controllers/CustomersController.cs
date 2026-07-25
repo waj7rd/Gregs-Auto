@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Gregs_Auto.Domain.EntityModels;
@@ -6,6 +7,9 @@ using Gregs_Auto.ViewModels;
 
 namespace Gregs_Auto.Controllers;
 
+// Staff-only: managing customer/vehicle records isn't something a walk-in
+// visitor should be able to do from the public site.
+[Authorize]
 public class CustomersController : Controller
 {
     private readonly ICustomerRepository _customerRepository;

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Gregs_Auto.DAL.Context;
 using Gregs_Auto.DAL.Repositories;
@@ -15,6 +16,15 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<GregsAutoContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("GregsAutoContext")));
 
+// Cookie auth for staff sign-in. No ASP.NET Core Identity — just the built-in
+// cookie handler plus our own Users table/PasswordHasher.
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/Login";
+    });
+
 // Repositories: bind each interface to its implementation.
 // Scoped = one instance per web request.
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
@@ -25,6 +35,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Logic layer (business rules) — bind interface to implementation.
 builder.Services.AddScoped<IAppointmentLogic, AppointmentLogic>();
+builder.Services.AddScoped<IUserLogic, UserLogic>();
 
 var app = builder.Build();
 
@@ -41,6 +52,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Must come before UseAuthorization — authorization checks read the identity
+// authentication sets up here.
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Gregs_Auto.Domain.Implementations.Interfaces;
 using Gregs_Auto.Domain.IRepositories;
@@ -42,6 +43,7 @@ public class AppointmentsController : Controller
     }
 
     // GET /Appointments/Manage — staff view of every appointment, with status actions.
+    [Authorize]
     public async Task<IActionResult> Manage()
     {
         var appointments = await _appointmentLogic.GetUpcomingAsync();
@@ -49,6 +51,7 @@ public class AppointmentsController : Controller
     }
 
     // POST /Appointments/Start — Scheduled -> InProgress
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Start(int id)
@@ -58,6 +61,7 @@ public class AppointmentsController : Controller
     }
 
     // POST /Appointments/Complete — Scheduled/InProgress -> Completed
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Complete(int id)
@@ -67,6 +71,7 @@ public class AppointmentsController : Controller
     }
 
     // POST /Appointments/Cancel — Scheduled/InProgress -> Cancelled
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Cancel(int id)
