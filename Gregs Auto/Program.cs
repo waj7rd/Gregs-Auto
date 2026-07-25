@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Gregs_Auto.DAL.Context;
 using Gregs_Auto.DAL.Repositories;
 using Gregs_Auto.Domain.IRepositories;
+using Gregs_Auto.Domain.Implementations;
+using Gregs_Auto.Domain.Implementations.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +23,8 @@ builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-// Logic-layer services get registered here as they're added,
-// e.g. builder.Services.AddScoped<IFooLogic, FooLogic>();
+// Logic layer (business rules) — bind interface to implementation.
+builder.Services.AddScoped<IAppointmentLogic, AppointmentLogic>();
 
 var app = builder.Build();
 

@@ -1,0 +1,97 @@
+@using Gregs_Auto.ViewModels
+@model ScheduleAppointmentViewModel
+
+@{
+    ViewData["Title"] = "Schedule Appointment";
+}
+
+<h1>Schedule Appointment</h1>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div class="row">
+    <div class="col-md-5">
+        <h5>Book a service</h5>
+
+        @if (!Model.Vehicles.Any())
+        {
+            <p class="text-muted">No vehicles on file yet &mdash; add a Customer and Vehicle first.</p>
+        }
+        else if (!Model.Services.Any())
+        {
+            <p class="text-muted">No services in the catalog yet.</p>
+        }
+        else
+        {
+            <form asp-controller="Appointments" asp-action="Book" method="post" class="row g-2 align-items-end">
+                <div class="col-12">
+                    <label class="form-label" for="vehicleId">Vehicle</label>
+                    <select class="form-select" name="vehicleId" id="vehicleId" required>
+                        @foreach (var v in Model.Vehicles)
+                        {
+                            <option value="@v.Id">@v.CustomerName &mdash; @v.Description</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="serviceId">Service</label>
+                    <select class="form-select" name="serviceId" id="serviceId" required>
+                        @foreach (var s in Model.Services)
+                        {
+                            <option value="@s.Id">@s.Name (@s.EstimatedDurationMinutes min, @s.Price.ToString("C"))</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="scheduledAt">Date &amp; time</label>
+                    <input class="form-control" type="datetime-local" name="scheduledAt" id="scheduledAt" required />
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="notes">Notes</label>
+                    <textarea class="form-control" name="notes" id="notes" rows="2"></textarea>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Schedule appointment</button>
+                </div>
+            </form>
+        }
+    </div>
+
+    <div class="col-md-7">
+        <h5>Upcoming appointments</h5>
+
+        @if (!Model.UpcomingAppointments.Any())
+        {
+            <p class="text-muted">Nothing on the schedule yet.</p>
+        }
+        else
+        {
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>When</th>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th>Service</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in Model.UpcomingAppointments)
+                    {
+                        <tr>
+                            <td>@a.ScheduledAt.ToString("g")</td>
+                            <td>@a.CustomerName</td>
+                            <td>@a.VehicleDescription</td>
+                            <td>@a.ServiceName</td>
+                            <td>@a.Status</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
