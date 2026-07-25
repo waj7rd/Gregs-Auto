@@ -1,0 +1,79 @@
+@using Gregs_Auto.ViewModels
+@model CustomerDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.FullName;
+}
+
+<h1>@Model.FullName</h1>
+<p class="text-muted">
+    @(Model.Email ?? "—") &middot; @(Model.Phone ?? "—")
+</p>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div class="row">
+    <div class="col-md-7">
+        <h5>Vehicles</h5>
+
+        @if (!Model.Vehicles.Any())
+        {
+            <p class="text-muted">No vehicles on file yet.</p>
+        }
+        else
+        {
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Vehicle</th>
+                        <th>VIN</th>
+                        <th>Plate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model.Vehicles)
+                    {
+                        <tr>
+                            <td>@v.Year @v.Make @v.Model</td>
+                            <td>@(v.Vin ?? "—")</td>
+                            <td>@(v.LicensePlate ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <div class="col-md-5">
+        <h5>Add a vehicle</h5>
+        <form asp-controller="Customers" asp-action="AddVehicle" method="post" class="row g-2 align-items-end">
+            <input type="hidden" name="customerId" value="@Model.CustomerId" />
+            <div class="col-6">
+                <label class="form-label" for="year">Year</label>
+                <input class="form-control" type="number" name="year" id="year" min="1900" max="2100" required />
+            </div>
+            <div class="col-6">
+                <label class="form-label" for="make">Make</label>
+                <input class="form-control" type="text" name="make" id="make" required />
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="model">Model</label>
+                <input class="form-control" type="text" name="model" id="model" required />
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="vin">VIN</label>
+                <input class="form-control" type="text" name="vin" id="vin" maxlength="17" />
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="licensePlate">License plate</label>
+                <input class="form-control" type="text" name="licensePlate" id="licensePlate" />
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Add vehicle</button>
+            </div>
+        </form>
+    </div>
+</div>

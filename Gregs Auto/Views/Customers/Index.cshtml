@@ -1,0 +1,40 @@
+@using Gregs_Auto.ViewModels
+@model List<CustomerRowViewModel>
+
+@{
+    ViewData["Title"] = "Customers";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Customers</h1>
+    <a class="btn btn-primary" asp-controller="Customers" asp-action="Create">Add Customer</a>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No customers yet.</p>
+}
+else
+{
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th class="text-end">Vehicles</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td><a asp-controller="Customers" asp-action="Details" asp-route-id="@c.Id">@c.FullName</a></td>
+                    <td>@(c.Email ?? "—")</td>
+                    <td>@(c.Phone ?? "—")</td>
+                    <td class="text-end">@c.VehicleCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
