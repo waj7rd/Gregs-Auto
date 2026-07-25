@@ -3,9 +3,10 @@ using Gregs_Auto.ViewModels.Validation;
 
 namespace Gregs_Auto.ViewModels;
 
-public class EditVehicleViewModel
+// The "add a vehicle" form on the customer detail page. Same rules as
+// EditVehicleViewModel, minus the VehicleId that doesn't exist yet.
+public class CreateVehicleViewModel
 {
-    public int VehicleId { get; set; }
     public int CustomerId { get; set; }
 
     [Required]

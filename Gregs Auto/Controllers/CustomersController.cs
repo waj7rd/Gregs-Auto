@@ -189,8 +189,8 @@ public class CustomersController : Controller
         vehicle.Year = viewModel.Year;
         vehicle.Make = viewModel.Make.Trim();
         vehicle.Model = viewModel.Model.Trim();
-        vehicle.Vin = string.IsNullOrWhiteSpace(viewModel.Vin) ? null : viewModel.Vin.Trim();
-        vehicle.LicensePlate = string.IsNullOrWhiteSpace(viewModel.LicensePlate) ? null : viewModel.LicensePlate.Trim();
+        vehicle.Vin = string.IsNullOrWhiteSpace(viewModel.Vin) ? null : viewModel.Vin.Trim().ToUpperInvariant();
+        vehicle.LicensePlate = string.IsNullOrWhiteSpace(viewModel.LicensePlate) ? null : viewModel.LicensePlate.Trim().ToUpperInvariant();
 
         try
         {
@@ -237,27 +237,27 @@ public class CustomersController : Controller
     // POST /Customers/AddVehicle
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddVehicle(int customerId, string make, string model, short year, string? vin, string? licensePlate)
+    public async Task<IActionResult> AddVehicle(CreateVehicleViewModel newVehicle)
     {
-        var customer = await _customerRepository.GetByIdWithVehiclesAsync(customerId);
+        var customer = await _customerRepository.GetByIdWithVehiclesAsync(newVehicle.CustomerId);
         if (customer == null)
             return NotFound();
 
-        if (string.IsNullOrWhiteSpace(make) || string.IsNullOrWhiteSpace(model))
+        if (!ModelState.IsValid)
         {
             var viewModel = BuildDetailsViewModel(customer);
-            viewModel.ErrorMessage = "Make and model are required.";
+            viewModel.NewVehicle = newVehicle;
             return View(nameof(Details), viewModel);
         }
 
         var vehicle = new Vehicle
         {
-            CustomerId = customerId,
-            Make = make.Trim(),
-            Model = model.Trim(),
-            Year = year,
-            Vin = string.IsNullOrWhiteSpace(vin) ? null : vin.Trim(),
-            LicensePlate = string.IsNullOrWhiteSpace(licensePlate) ? null : licensePlate.Trim(),
+            CustomerId = newVehicle.CustomerId,
+            Make = newVehicle.Make.Trim(),
+            Model = newVehicle.Model.Trim(),
+            Year = newVehicle.Year,
+            Vin = string.IsNullOrWhiteSpace(newVehicle.Vin) ? null : newVehicle.Vin.Trim().ToUpperInvariant(),
+            LicensePlate = string.IsNullOrWhiteSpace(newVehicle.LicensePlate) ? null : newVehicle.LicensePlate.Trim().ToUpperInvariant(),
             CreatedAt = DateTime.UtcNow
         };
 
@@ -269,11 +269,12 @@ public class CustomersController : Controller
         catch (DbUpdateException)
         {
             var viewModel = BuildDetailsViewModel(customer);
+            viewModel.NewVehicle = newVehicle;
             viewModel.ErrorMessage = "A vehicle with that VIN already exists.";
             return View(nameof(Details), viewModel);
         }
 
-        return RedirectToAction(nameof(Details), new { id = customerId });
+        return RedirectToAction(nameof(Details), new { id = newVehicle.CustomerId });
     }
 
     private static CustomerDetailsViewModel BuildDetailsViewModel(Customer customer)
@@ -292,7 +293,8 @@ public class CustomersController : Controller
                 Model = v.Model,
                 Vin = v.Vin,
                 LicensePlate = v.LicensePlate
-            }).ToList()
+            }).ToList(),
+            NewVehicle = new CreateVehicleViewModel { CustomerId = customer.CustomerId }
         };
     }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Gregs_Auto.ViewModels.Validation;
 
 namespace Gregs_Auto.ViewModels;
 
@@ -16,5 +17,6 @@ public class EditCustomerViewModel
     public string? Email { get; set; }
 
     [StringLength(30)]
+    [RegularExpression(ValidationPatterns.Phone, ErrorMessage = ValidationPatterns.PhoneMessage)]
     public string? Phone { get; set; }
 }

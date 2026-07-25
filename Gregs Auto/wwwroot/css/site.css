@@ -1,5 +1,17 @@
+:root {
+  --ga-navy: #14202e;
+  --ga-navy-soft: #1e2f42;
+  --ga-amber: #f5a524;
+  --ga-amber-dark: #d98c0d;
+  --ga-slate: #5b6b7d;
+  --ga-mist: #f4f6f8;
+  --ga-line: #e2e7ec;
+}
+
 html {
-  font-size: 14px;
+  font-size: 15px;
+  position: relative;
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -8,15 +20,222 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
-  margin-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  color: #22303f;
+  background-color: #fff;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+.btn:focus, .btn:active:focus, .form-control:focus, .form-select:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(245, 165, 36, 0.35);
+  border-color: var(--ga-amber);
+}
+
+/* ---------- Nav ---------- */
+
+.ga-navbar {
+  background-color: var(--ga-navy);
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.ga-brand {
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: -0.02em;
+  color: #fff !important;
+}
+
+.ga-brand .ga-brand-accent {
+  color: var(--ga-amber);
+}
+
+.ga-navbar .nav-link {
+  color: rgba(255, 255, 255, 0.78) !important;
+  font-weight: 500;
+  padding-left: 0.9rem !important;
+  padding-right: 0.9rem !important;
+  border-radius: 0.35rem;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.ga-navbar .nav-link:hover,
+.ga-navbar .nav-link:focus {
+  color: #fff !important;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.ga-navbar .nav-link.active {
+  color: var(--ga-amber) !important;
+}
+
+.ga-user {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+}
+
+.ga-navbar .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.ga-navbar .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255,255,255,0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* ---------- Buttons ---------- */
+
+.btn-primary {
+  background-color: var(--ga-amber);
+  border-color: var(--ga-amber);
+  color: var(--ga-navy);
+  font-weight: 600;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+  background-color: var(--ga-amber-dark) !important;
+  border-color: var(--ga-amber-dark) !important;
+  color: var(--ga-navy) !important;
+}
+
+.btn-outline-light-amber {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-outline-light-amber:hover {
+  background-color: #fff;
+  color: var(--ga-navy);
+}
+
+/* ---------- Hero ---------- */
+
+.ga-hero {
+  background: linear-gradient(135deg, var(--ga-navy) 0%, var(--ga-navy-soft) 100%);
+  color: #fff;
+  padding: 5rem 0;
+  margin-bottom: 3.5rem;
+}
+
+.ga-hero h1 {
+  font-weight: 700;
+  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+}
+
+.ga-hero p.lead {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 1.15rem;
+  max-width: 34rem;
+  margin-bottom: 2rem;
+}
+
+.ga-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ga-amber);
+  margin-bottom: 0.75rem;
+}
+
+/* ---------- Page headings ---------- */
+
+.ga-page-title {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.ga-page-sub {
+  color: var(--ga-slate);
+  margin-bottom: 1.75rem;
+}
+
+/* ---------- Cards ---------- */
+
+.ga-card {
+  background: #fff;
+  border: 1px solid var(--ga-line);
+  border-radius: 0.6rem;
+  padding: 1.5rem;
+  height: 100%;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.ga-card:hover {
+  box-shadow: 0 8px 24px rgba(20, 32, 46, 0.09);
+  transform: translateY(-2px);
+}
+
+.ga-card h3 {
+  font-size: 1.08rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.ga-card p {
+  color: var(--ga-slate);
+  font-size: 0.94rem;
+  margin-bottom: 0;
+}
+
+.ga-panel {
+  background: var(--ga-mist);
+  border: 1px solid var(--ga-line);
+  border-radius: 0.6rem;
+  padding: 1.5rem;
+}
+
+.ga-price {
+  font-weight: 700;
+  color: var(--ga-navy);
+}
+
+/* ---------- Tables ---------- */
+
+.table > thead th {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ga-slate);
+  border-bottom: 2px solid var(--ga-line);
+  font-weight: 700;
+}
+
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
+/* ---------- Forms ---------- */
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #33455a;
+}
+
+/* ---------- Footer ---------- */
+
+.ga-footer {
+  flex-shrink: 0;
+  background-color: var(--ga-navy);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 2rem 0;
+  margin-top: 4rem;
+  font-size: 0.9rem;
+}
+
+.ga-footer .ga-footer-brand {
+  color: #fff;
+  font-weight: 700;
 }

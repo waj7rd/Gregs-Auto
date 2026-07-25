@@ -2,11 +2,11 @@
 @model List<AppointmentRowViewModel>
 
 @{
-    ViewData["Title"] = "Manage Appointments";
+    ViewData["Title"] = "Schedule";
 }
 
-<h1>Manage Appointments</h1>
-<p class="text-muted">@Model.Count appointment(s).</p>
+<h1 class="ga-page-title">Shop Schedule</h1>
+<p class="ga-page-sub">@Model.Count appointment(s) on the books.</p>
 
 @if (!Model.Any())
 {
@@ -14,54 +14,60 @@
 }
 else
 {
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>When</th>
-                <th>Customer</th>
-                <th>Vehicle</th>
-                <th>Service</th>
-                <th>Status</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var a in Model)
-            {
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
                 <tr>
-                    <td>@a.ScheduledAt.ToString("g")</td>
-                    <td>@a.CustomerName</td>
-                    <td>@a.VehicleDescription</td>
-                    <td>@a.ServiceName</td>
-                    <td>
-                        <span class="badge @(a.Status == "Scheduled" ? "bg-primary"
-                                           : a.Status == "InProgress" ? "bg-warning text-dark"
-                                           : a.Status == "Completed" ? "bg-success"
-                                           : "bg-secondary")">@a.Status</span>
-                    </td>
-                    <td class="text-end">
-                        @if (a.Status == "Scheduled")
-                        {
-                            <form asp-controller="Appointments" asp-action="Start" method="post" class="d-inline">
-                                <input type="hidden" name="id" value="@a.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-warning">Start</button>
-                            </form>
-                        }
-                        @if (a.Status is "Scheduled" or "InProgress")
-                        {
-                            <form asp-controller="Appointments" asp-action="Complete" method="post" class="d-inline">
-                                <input type="hidden" name="id" value="@a.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-success">Complete</button>
-                            </form>
-                            <form asp-controller="Appointments" asp-action="Cancel" method="post"
-                                  onsubmit="return confirm('Cancel this appointment?');" class="d-inline">
-                                <input type="hidden" name="id" value="@a.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
-                            </form>
-                        }
-                    </td>
+                    <th>When</th>
+                    <th>Customer</th>
+                    <th>Vehicle</th>
+                    <th>Service</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var a in Model)
+                {
+                    <tr>
+                        <td class="text-nowrap">@a.ScheduledAt.ToString("MMM d, h:mm tt")</td>
+                        <td>@a.CustomerName</td>
+                        <td>@a.VehicleDescription</td>
+                        <td>@a.ServiceName</td>
+                        <td>
+                            <span class="badge @(a.Status == "Scheduled" ? "text-bg-primary"
+                                               : a.Status == "InProgress" ? "text-bg-warning"
+                                               : a.Status == "Completed" ? "text-bg-success"
+                                               : "text-bg-secondary")">@a.Status</span>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            @if (a.Status == "Scheduled")
+                            {
+                                <form asp-controller="Appointments" asp-action="Start" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@a.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-warning">Start</button>
+                                </form>
+                            }
+                            @if (a.Status is "Scheduled" or "InProgress")
+                            {
+                                <form asp-controller="Appointments" asp-action="Complete" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@a.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success">Complete</button>
+                                </form>
+                                <form asp-controller="Appointments" asp-action="Cancel" method="post"
+                                      onsubmit="return confirm('Cancel this appointment?');" class="d-inline">
+                                    <input type="hidden" name="id" value="@a.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">&mdash;</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }

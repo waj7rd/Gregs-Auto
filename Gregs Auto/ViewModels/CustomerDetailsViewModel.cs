@@ -11,6 +11,11 @@ public class CustomerDetailsViewModel
 
     public List<VehicleRowViewModel> Vehicles { get; set; } = new();
 
-    // Set when an "add vehicle" attempt fails, e.g. duplicate VIN.
+    // Backs the "add a vehicle" form, so a failed submit can redisplay what
+    // was typed alongside the per-field validation messages.
+    public CreateVehicleViewModel NewVehicle { get; set; } = new();
+
+    // Set when an operation fails for a reason that isn't field-level,
+    // e.g. a delete blocked by existing appointment history.
     public string? ErrorMessage { get; set; }
 }

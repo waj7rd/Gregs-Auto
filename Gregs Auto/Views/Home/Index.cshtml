@@ -1,8 +1,81 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@using Gregs_Auto.ViewModels
+@model List<ServiceRowViewModel>
+
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@section Hero {
+    <section class="ga-hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="ga-eyebrow">Family owned &middot; ASE certified</div>
+                    <h1>Straight answers and honest repairs.</h1>
+                    <p class="lead">
+                        From a routine oil change to a full brake job, we'll tell you what your
+                        car actually needs &mdash; and what it doesn't. Book online in under a minute.
+                    </p>
+                    <a class="btn btn-primary btn-lg" asp-controller="Appointments" asp-action="Schedule">Book a Service</a>
+                    <a class="btn btn-outline-light-amber btn-lg ms-2" asp-controller="Services" asp-action="Index">See Pricing</a>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="ga-card">
+            <h3>Upfront pricing</h3>
+            <p>Every service is priced on our site before you walk in. No surprise line items when you pick up.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="ga-card">
+            <h3>Same-week appointments</h3>
+            <p>Most routine work can be booked within a few days, and we'll text you when it's ready.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="ga-card">
+            <h3>We keep your history</h3>
+            <p>Every visit is logged against your vehicle, so we know what was done and when it's due again.</p>
+        </div>
+    </div>
+</div>
+
+@if (Model.Any())
+{
+    <div class="d-flex justify-content-between align-items-end mb-3">
+        <div>
+            <h2 class="ga-page-title">Popular services</h2>
+            <p class="ga-page-sub mb-0">Our most-booked work, priced up front.</p>
+        </div>
+        <a class="btn btn-outline-secondary" asp-controller="Services" asp-action="Index">All services</a>
+    </div>
+
+    <div class="row g-4 mb-5">
+        @foreach (var s in Model)
+        {
+            <div class="col-md-4">
+                <div class="ga-card d-flex flex-column">
+                    <h3>@s.Name</h3>
+                    <p class="flex-grow-1">@(s.Description ?? "")</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="ga-price">@(s.Price > 0 ? s.Price.ToString("C") : "Free")</span>
+                        <span class="text-muted small">@s.EstimatedDurationMinutes min</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<div class="ga-panel d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h2 class="ga-page-title h4 mb-1">Ready to get on the schedule?</h2>
+        <p class="mb-0 text-muted">Pick your vehicle, choose a service, and grab a time that works.</p>
+    </div>
+    <a class="btn btn-primary" asp-controller="Appointments" asp-action="Schedule">Book a Service</a>
 </div>

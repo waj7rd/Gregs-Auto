@@ -5,7 +5,8 @@
     ViewData["Title"] = "Services";
 }
 
-<h1>Services</h1>
+<h1 class="ga-page-title">Services &amp; Pricing</h1>
+<p class="ga-page-sub">What we do, how long it takes, and what it costs.</p>
 
 @if (!Model.Any())
 {
@@ -13,29 +14,22 @@
 }
 else
 {
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>Service</th>
-                <th>Description</th>
-                <th class="text-end">Duration</th>
-                <th class="text-end">Price</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var s in Model)
-            {
-                <tr>
-                    <td>@s.Name</td>
-                    <td>@(s.Description ?? "—")</td>
-                    <td class="text-end">@s.EstimatedDurationMinutes min</td>
-                    <td class="text-end">@(s.Price > 0 ? s.Price.ToString("C") : "Free")</td>
-                    <td class="text-end">
-                        <a class="btn btn-sm btn-primary" asp-controller="Appointments" asp-action="Schedule">Schedule</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="row g-4 mb-4">
+        @foreach (var s in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="ga-card d-flex flex-column">
+                    <h3>@s.Name</h3>
+                    <p class="flex-grow-1">@(s.Description ?? "")</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                        <div>
+                            <div class="ga-price fs-5">@(s.Price > 0 ? s.Price.ToString("C") : "Free")</div>
+                            <div class="text-muted small">about @s.EstimatedDurationMinutes min</div>
+                        </div>
+                        <a class="btn btn-sm btn-primary" asp-controller="Appointments" asp-action="Schedule">Book</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 }

@@ -1,62 +1,66 @@
-﻿<!DOCTYPE html>
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    string NavClass(string c, string? a = null) =>
+        controller == c && (a == null || action == a) ? "nav-link active" : "nav-link";
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Gregs_Auto</title>
+    <title>@ViewData["Title"] &middot; Greg's Auto</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Gregs_Auto.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Gregs_Auto</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-md ga-navbar">
+            <div class="container">
+                <a class="navbar-brand ga-brand" asp-controller="Home" asp-action="Index">
+                    Greg's<span class="ga-brand-accent">Auto</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#gaNav"
+                        aria-controls="gaNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse" id="gaNav">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="@NavClass("Home", "Index")" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Services" asp-action="Index">Services</a>
+                            <a class="@NavClass("Services")" asp-controller="Services" asp-action="Index">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Appointments" asp-action="Schedule">Schedule Appointment</a>
+                            <a class="@NavClass("Appointments", "Schedule")" asp-controller="Appointments" asp-action="Schedule">Book a Service</a>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Customers" asp-action="Index">Customers</a>
+                                <a class="@NavClass("Appointments", "Manage")" asp-controller="Appointments" asp-action="Manage">Schedule</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Appointments" asp-action="Manage">Manage Appointments</a>
+                                <a class="@NavClass("Customers")" asp-controller="Customers" asp-action="Index">Customers</a>
                             </li>
                         }
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
                     </ul>
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav align-items-md-center">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item d-flex align-items-center me-2">
-                                <span class="text-muted">Signed in as @User.Identity!.Name</span>
+                            <li class="nav-item me-md-3">
+                                <span class="ga-user">@User.Identity!.Name</span>
                             </li>
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post">
-                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Log Out</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-light-amber">Log Out</button>
                                 </form>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Log In</a>
+                                <a class="btn btn-sm btn-outline-light-amber" asp-controller="Account" asp-action="Login">Staff Log In</a>
                             </li>
                         }
                     </ul>
@@ -64,17 +68,23 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
+    <main role="main">
+        @* Full-bleed slot for the home page hero; every other view just gets
+           the centered container below. *@
+        @await RenderSectionAsync("Hero", required: false)
         <div class="container">
-            &copy; 2026 - Gregs_Auto - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="ga-footer">
+        <div class="container d-flex flex-wrap justify-content-between gap-2">
+            <span><span class="ga-footer-brand">Greg's Auto</span> &mdash; honest service since 1998</span>
+            <span>&copy; @DateTime.Now.Year Greg's Auto</span>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

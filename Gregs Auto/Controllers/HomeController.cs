@@ -1,32 +1,44 @@
-using Gregs_Auto.Models;
-using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Gregs_Auto.Domain.IRepositories;
+using Gregs_Auto.Models;
+using Gregs_Auto.ViewModels;
 
-namespace Gregs_Auto.Controllers
+namespace Gregs_Auto.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly IServiceRepository _serviceRepository;
+
+    public HomeController(IServiceRepository serviceRepository)
     {
-        private readonly ILogger<HomeController> _logger;
+        _serviceRepository = serviceRepository;
+    }
 
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
+    // GET /
+    public async Task<IActionResult> Index()
+    {
+        // A short teaser of the catalog — the full list lives on /Services.
+        var services = await _serviceRepository.GetAllAsync();
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        var featured = services
+            .OrderBy(s => s.Price)
+            .Take(3)
+            .Select(s => new ServiceRowViewModel
+            {
+                Id = s.ServiceId,
+                Name = s.Name,
+                Description = s.Description,
+                EstimatedDurationMinutes = s.EstimatedDurationMinutes,
+                Price = s.Price
+            }).ToList();
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        return View(featured);
+    }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }

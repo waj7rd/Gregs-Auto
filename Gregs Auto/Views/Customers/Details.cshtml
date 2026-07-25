@@ -5,14 +5,14 @@
     ViewData["Title"] = Model.FullName;
 }
 
-<div class="d-flex justify-content-between align-items-start mb-2">
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4">
     <div>
-        <h1 class="mb-0">@Model.FullName</h1>
-        <p class="text-muted">
-            @(Model.Email ?? "—") &middot; @(Model.Phone ?? "—")
+        <h1 class="ga-page-title">@Model.FullName</h1>
+        <p class="ga-page-sub mb-0">
+            @(Model.Email ?? "no email on file") &middot; @(Model.Phone ?? "no phone on file")
         </p>
     </div>
-    <div>
+    <div class="text-nowrap">
         <a class="btn btn-sm btn-outline-secondary" asp-controller="Customers" asp-action="Edit" asp-route-id="@Model.CustomerId">Edit</a>
         <form asp-controller="Customers" asp-action="Delete" method="post"
               onsubmit="return confirm('Delete this customer?');" class="d-inline">
@@ -27,9 +27,9 @@
     <div class="alert alert-danger">@Model.ErrorMessage</div>
 }
 
-<div class="row">
-    <div class="col-md-7">
-        <h5>Vehicles</h5>
+<div class="row g-4">
+    <div class="col-lg-7">
+        <h2 class="h5 mb-3">Vehicles</h2>
 
         @if (!Model.Vehicles.Any())
         {
@@ -37,65 +37,82 @@
         }
         else
         {
-            <table class="table table-striped align-middle">
-                <thead>
-                    <tr>
-                        <th>Vehicle</th>
-                        <th>VIN</th>
-                        <th>Plate</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var v in Model.Vehicles)
-                    {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
                         <tr>
-                            <td>@v.Year @v.Make @v.Model</td>
-                            <td>@(v.Vin ?? "—")</td>
-                            <td>@(v.LicensePlate ?? "—")</td>
-                            <td class="text-end">
-                                <a class="btn btn-sm btn-outline-secondary" asp-controller="Customers" asp-action="EditVehicle" asp-route-id="@v.Id">Edit</a>
-                                <form asp-controller="Customers" asp-action="DeleteVehicle" method="post"
-                                      onsubmit="return confirm('Delete this vehicle?');" class="d-inline">
-                                    <input type="hidden" name="id" value="@v.Id" />
-                                    <input type="hidden" name="customerId" value="@Model.CustomerId" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                </form>
-                            </td>
+                            <th>Vehicle</th>
+                            <th>VIN</th>
+                            <th>Plate</th>
+                            <th class="text-end">Actions</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in Model.Vehicles)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@v.Year @v.Make @v.Model</td>
+                                <td><code class="small">@(v.Vin ?? "—")</code></td>
+                                <td>@(v.LicensePlate ?? "—")</td>
+                                <td class="text-end text-nowrap">
+                                    <a class="btn btn-sm btn-outline-secondary" asp-controller="Customers" asp-action="EditVehicle" asp-route-id="@v.Id">Edit</a>
+                                    <form asp-controller="Customers" asp-action="DeleteVehicle" method="post"
+                                          onsubmit="return confirm('Delete this vehicle?');" class="d-inline">
+                                        <input type="hidden" name="id" value="@v.Id" />
+                                        <input type="hidden" name="customerId" value="@Model.CustomerId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         }
     </div>
 
-    <div class="col-md-5">
-        <h5>Add a vehicle</h5>
-        <form asp-controller="Customers" asp-action="AddVehicle" method="post" class="row g-2 align-items-end">
-            <input type="hidden" name="customerId" value="@Model.CustomerId" />
-            <div class="col-6">
-                <label class="form-label" for="year">Year</label>
-                <input class="form-control" type="number" name="year" id="year" min="1900" max="2100" required />
-            </div>
-            <div class="col-6">
-                <label class="form-label" for="make">Make</label>
-                <input class="form-control" type="text" name="make" id="make" required />
-            </div>
-            <div class="col-12">
-                <label class="form-label" for="model">Model</label>
-                <input class="form-control" type="text" name="model" id="model" required />
-            </div>
-            <div class="col-12">
-                <label class="form-label" for="vin">VIN</label>
-                <input class="form-control" type="text" name="vin" id="vin" maxlength="17" />
-            </div>
-            <div class="col-12">
-                <label class="form-label" for="licensePlate">License plate</label>
-                <input class="form-control" type="text" name="licensePlate" id="licensePlate" />
-            </div>
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Add vehicle</button>
-            </div>
-        </form>
+    <div class="col-lg-5">
+        <div class="ga-panel">
+            <h2 class="h5 mb-3">Add a vehicle</h2>
+            <form asp-controller="Customers" asp-action="AddVehicle" method="post" class="row g-3">
+                <input type="hidden" asp-for="NewVehicle.CustomerId" />
+
+                <div class="col-4">
+                    <label class="form-label" asp-for="NewVehicle.Year">Year</label>
+                    <input class="form-control" asp-for="NewVehicle.Year" type="number" />
+                </div>
+                <div class="col-8">
+                    <label class="form-label" asp-for="NewVehicle.Make">Make</label>
+                    <input class="form-control" asp-for="NewVehicle.Make" />
+                </div>
+                <div class="col-12">
+                    <span asp-validation-for="NewVehicle.Year" class="text-danger small"></span>
+                    <span asp-validation-for="NewVehicle.Make" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label" asp-for="NewVehicle.Model">Model</label>
+                    <input class="form-control" asp-for="NewVehicle.Model" />
+                    <span asp-validation-for="NewVehicle.Model" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <label class="form-label" asp-for="NewVehicle.Vin"></label>
+                    <input class="form-control" asp-for="NewVehicle.Vin" placeholder="17 characters, optional" />
+                    <span asp-validation-for="NewVehicle.Vin" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <label class="form-label" asp-for="NewVehicle.LicensePlate"></label>
+                    <input class="form-control" asp-for="NewVehicle.LicensePlate" />
+                    <span asp-validation-for="NewVehicle.LicensePlate" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary w-100">Add vehicle</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
