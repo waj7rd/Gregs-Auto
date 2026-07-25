@@ -1,0 +1,41 @@
+@using Gregs_Auto.ViewModels
+@model List<ServiceRowViewModel>
+
+@{
+    ViewData["Title"] = "Services";
+}
+
+<h1>Services</h1>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No services in the catalog yet.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Description</th>
+                <th class="text-end">Duration</th>
+                <th class="text-end">Price</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr>
+                    <td>@s.Name</td>
+                    <td>@(s.Description ?? "—")</td>
+                    <td class="text-end">@s.EstimatedDurationMinutes min</td>
+                    <td class="text-end">@(s.Price > 0 ? s.Price.ToString("C") : "Free")</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-primary" asp-controller="Appointments" asp-action="Schedule">Schedule</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
