@@ -9,16 +9,25 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] &middot; Greg's Auto</title>
+    <title>@ViewData["Title"] &middot; Greg's Automotive</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-md ga-navbar">
+    <header class="ga-header">
+        <nav class="navbar navbar-expand-lg ga-navbar">
             <div class="container">
-                <a class="navbar-brand ga-brand" asp-controller="Home" asp-action="Index">
-                    Greg's<span class="ga-brand-accent">Auto</span>
+                <a class="navbar-brand p-0 me-4" asp-controller="Home" asp-action="Index">
+                    @* Drop the shop's logo at wwwroot/images/logo.png and it replaces the
+                       text wordmark automatically; the fallback keeps the header intact
+                       until then. *@
+                    <img src="~/images/logo.png" alt="Greg's Automotive — Service You Can Trust!"
+                         class="ga-logo"
+                         onerror="this.style.display='none';document.getElementById('ga-wordmark').style.display='block';" />
+                    <span class="ga-wordmark" id="ga-wordmark" style="display:none;">
+                        <span class="ga-wordmark-name">Greg's <span>Automotive</span></span>
+                        <span class="ga-wordmark-tag">Service You Can Trust!</span>
+                    </span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#gaNav"
                         aria-controls="gaNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,43 +54,70 @@
                             </li>
                         }
                     </ul>
-                    <ul class="navbar-nav align-items-md-center">
+                    <ul class="navbar-nav align-items-lg-center">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item me-md-3">
+                            <li class="nav-item me-lg-3">
                                 <span class="ga-user">@User.Identity!.Name</span>
                             </li>
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post">
-                                    <button type="submit" class="btn btn-sm btn-outline-light-amber">Log Out</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Log Out</button>
                                 </form>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="btn btn-sm btn-outline-light-amber" asp-controller="Account" asp-action="Login">Staff Log In</a>
+                                <a class="btn btn-sm btn-outline-secondary" asp-controller="Account" asp-action="Login">Staff Log In</a>
                             </li>
                         }
                     </ul>
                 </div>
             </div>
         </nav>
+
+        <div class="ga-checker"></div>
+
+        <div class="ga-contact-bar">
+            <div class="container text-center">
+                <a href="tel:+16365288204">636.528.8204</a>
+                <span class="ga-contact-sep">|</span>
+                <span>396 TRAVIS BLVD</span>
+                <span class="ga-contact-sep">|</span>
+                <span>TROY, MO 63379</span>
+            </div>
+        </div>
     </header>
 
     <main role="main">
         @* Full-bleed slot for the home page hero; every other view just gets
            the centered container below. *@
         @await RenderSectionAsync("Hero", required: false)
-        <div class="container">
+        <div class="container @(IsSectionDefined("Hero") ? "" : "pt-4")">
             @RenderBody()
         </div>
     </main>
 
     <footer class="ga-footer">
-        <div class="container d-flex flex-wrap justify-content-between gap-2">
-            <span><span class="ga-footer-brand">Greg's Auto</span> &mdash; honest service since 1998</span>
-            <span>&copy; @DateTime.Now.Year Greg's Auto</span>
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-5">
+                    <div class="ga-footer-brand mb-2">Greg's Automotive</div>
+                    <div>Service You Can Trust!</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="ga-footer-brand mb-2">Visit Us</div>
+                    <div>396 Travis Blvd</div>
+                    <div>Troy, MO 63379</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="ga-footer-brand mb-2">Call Us</div>
+                    <div><a href="tel:+16365288204">636.528.8204</a></div>
+                </div>
+            </div>
+            <hr class="border-light opacity-25 my-4" />
+            <div>&copy; @DateTime.Now.Year Greg's Automotive</div>
         </div>
     </footer>
 

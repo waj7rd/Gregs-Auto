@@ -1,11 +1,13 @@
 :root {
-  --ga-navy: #14202e;
-  --ga-navy-soft: #1e2f42;
-  --ga-amber: #f5a524;
-  --ga-amber-dark: #d98c0d;
-  --ga-slate: #5b6b7d;
-  --ga-mist: #f4f6f8;
-  --ga-line: #e2e7ec;
+  /* Pulled from the shop's printed ad: royal blue wordmark, bright red banner. */
+  --ga-red: #d9232a;
+  --ga-red-dark: #b0181e;
+  --ga-blue: #1c3c8c;
+  --ga-blue-dark: #142c68;
+  --ga-ink: #1a1a1a;
+  --ga-slate: #5c6672;
+  --ga-mist: #f5f6f8;
+  --ga-line: #e3e6ea;
 }
 
 html {
@@ -25,7 +27,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   margin: 0;
-  color: #22303f;
+  color: var(--ga-ink);
   background-color: #fff;
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
 }
@@ -35,106 +37,179 @@ main {
 }
 
 .btn:focus, .btn:active:focus, .form-control:focus, .form-select:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.2rem rgba(245, 165, 36, 0.35);
-  border-color: var(--ga-amber);
+  box-shadow: 0 0 0 0.2rem rgba(217, 35, 42, 0.28);
+  border-color: var(--ga-red);
 }
 
-/* ---------- Nav ---------- */
+/* ---------- Checkered flag motif ---------- */
+
+.ga-checker {
+  height: 10px;
+  background-image:
+    linear-gradient(45deg, #1a1a1a 25%, transparent 25%, transparent 75%, #1a1a1a 75%),
+    linear-gradient(45deg, #1a1a1a 25%, transparent 25%, transparent 75%, #1a1a1a 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+  background-color: #fff;
+}
+
+/* ---------- Header ---------- */
+
+.ga-header {
+  background-color: #fff;
+}
 
 .ga-navbar {
-  background-color: var(--ga-navy);
-  padding-top: 0.65rem;
-  padding-bottom: 0.65rem;
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
 }
 
-.ga-brand {
-  font-weight: 700;
-  font-size: 1.3rem;
+.ga-logo {
+  max-height: 68px;
+  width: auto;
+}
+
+/* Text wordmark shown only if the logo image hasn't been dropped in yet. */
+.ga-wordmark {
+  line-height: 1;
+  text-decoration: none;
+}
+
+.ga-wordmark .ga-wordmark-name {
+  display: block;
+  font-weight: 800;
+  font-size: 1.65rem;
   letter-spacing: -0.02em;
-  color: #fff !important;
+  color: var(--ga-blue);
+  text-transform: uppercase;
 }
 
-.ga-brand .ga-brand-accent {
-  color: var(--ga-amber);
+.ga-wordmark .ga-wordmark-name span {
+  color: var(--ga-red);
+}
+
+.ga-wordmark .ga-wordmark-tag {
+  display: block;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--ga-ink);
+  margin-top: 0.15rem;
 }
 
 .ga-navbar .nav-link {
-  color: rgba(255, 255, 255, 0.78) !important;
-  font-weight: 500;
-  padding-left: 0.9rem !important;
-  padding-right: 0.9rem !important;
-  border-radius: 0.35rem;
-  transition: color 0.15s ease, background-color 0.15s ease;
+  color: var(--ga-blue) !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.86rem;
+  letter-spacing: 0.02em;
+  padding-left: 0.85rem !important;
+  padding-right: 0.85rem !important;
+  border-bottom: 3px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
 .ga-navbar .nav-link:hover,
 .ga-navbar .nav-link:focus {
-  color: #fff !important;
-  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--ga-red) !important;
+  border-bottom-color: var(--ga-red);
 }
 
 .ga-navbar .nav-link.active {
-  color: var(--ga-amber) !important;
-}
-
-.ga-user {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.875rem;
+  color: var(--ga-red) !important;
+  border-bottom-color: var(--ga-red);
 }
 
 .ga-navbar .navbar-toggler {
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: var(--ga-blue);
 }
 
-.ga-navbar .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255,255,255,0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+/* Red contact band, mirroring the bottom bar of the shop's ad. */
+.ga-contact-bar {
+  background-color: var(--ga-red);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.6rem 0;
+  font-size: 1.02rem;
+}
+
+.ga-contact-bar a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.ga-contact-bar a:hover {
+  text-decoration: underline;
+}
+
+.ga-contact-sep {
+  opacity: 0.55;
+  margin: 0 0.6rem;
+}
+
+.ga-user {
+  color: var(--ga-slate);
+  font-size: 0.875rem;
 }
 
 /* ---------- Buttons ---------- */
 
 .btn-primary {
-  background-color: var(--ga-amber);
-  border-color: var(--ga-amber);
-  color: var(--ga-navy);
-  font-weight: 600;
+  background-color: var(--ga-red);
+  border-color: var(--ga-red);
+  color: #fff;
+  font-weight: 700;
 }
 
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
-  background-color: var(--ga-amber-dark) !important;
-  border-color: var(--ga-amber-dark) !important;
-  color: var(--ga-navy) !important;
+  background-color: var(--ga-red-dark) !important;
+  border-color: var(--ga-red-dark) !important;
+  color: #fff !important;
 }
 
-.btn-outline-light-amber {
-  border-color: rgba(255, 255, 255, 0.5);
-  color: #fff;
+.btn-outline-secondary {
+  border-color: var(--ga-blue);
+  color: var(--ga-blue);
   font-weight: 600;
 }
 
-.btn-outline-light-amber:hover {
+.btn-outline-secondary:hover {
+  background-color: var(--ga-blue);
+  border-color: var(--ga-blue);
+  color: #fff;
+}
+
+.btn-on-blue {
+  border: 2px solid #fff;
+  color: #fff;
+  font-weight: 700;
+}
+
+.btn-on-blue:hover {
   background-color: #fff;
-  color: var(--ga-navy);
+  color: var(--ga-blue);
 }
 
 /* ---------- Hero ---------- */
 
 .ga-hero {
-  background: linear-gradient(135deg, var(--ga-navy) 0%, var(--ga-navy-soft) 100%);
+  background: linear-gradient(135deg, var(--ga-blue) 0%, var(--ga-blue-dark) 100%);
   color: #fff;
-  padding: 5rem 0;
-  margin-bottom: 3.5rem;
+  padding: 4.5rem 0;
 }
 
 .ga-hero h1 {
-  font-weight: 700;
-  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  font-weight: 800;
+  font-size: clamp(2rem, 5vw, 3.3rem);
   letter-spacing: -0.03em;
   margin-bottom: 1rem;
+  text-transform: uppercase;
 }
 
 .ga-hero p.lead {
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.14rem;
   max-width: 34rem;
   margin-bottom: 2rem;
 }
@@ -143,16 +218,40 @@ main {
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--ga-amber);
-  margin-bottom: 0.75rem;
+  font-weight: 800;
+  color: #fff;
+  background: var(--ga-red);
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.2rem;
+  margin-bottom: 0.9rem;
+}
+
+.ga-hero-services {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
+.ga-hero-services span {
+  white-space: nowrap;
+}
+
+.ga-hero-services .ga-contact-sep {
+  color: var(--ga-red);
+  opacity: 1;
+  font-weight: 800;
 }
 
 /* ---------- Page headings ---------- */
 
 .ga-page-title {
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.02em;
+  color: var(--ga-blue);
   margin-bottom: 0.25rem;
 }
 
@@ -166,20 +265,22 @@ main {
 .ga-card {
   background: #fff;
   border: 1px solid var(--ga-line);
-  border-radius: 0.6rem;
+  border-top: 4px solid var(--ga-red);
+  border-radius: 0.4rem;
   padding: 1.5rem;
   height: 100%;
   transition: box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .ga-card:hover {
-  box-shadow: 0 8px 24px rgba(20, 32, 46, 0.09);
+  box-shadow: 0 8px 24px rgba(28, 60, 140, 0.12);
   transform: translateY(-2px);
 }
 
 .ga-card h3 {
   font-size: 1.08rem;
-  font-weight: 700;
+  font-weight: 800;
+  color: var(--ga-blue);
   margin-bottom: 0.4rem;
 }
 
@@ -192,13 +293,13 @@ main {
 .ga-panel {
   background: var(--ga-mist);
   border: 1px solid var(--ga-line);
-  border-radius: 0.6rem;
+  border-radius: 0.4rem;
   padding: 1.5rem;
 }
 
 .ga-price {
-  font-weight: 700;
-  color: var(--ga-navy);
+  font-weight: 800;
+  color: var(--ga-red);
 }
 
 /* ---------- Tables ---------- */
@@ -207,9 +308,9 @@ main {
   font-size: 0.76rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--ga-slate);
+  color: var(--ga-blue);
   border-bottom: 2px solid var(--ga-line);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .table > tbody > tr > td {
@@ -219,7 +320,7 @@ main {
 /* ---------- Forms ---------- */
 
 .form-label {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.88rem;
   color: #33455a;
 }
@@ -228,14 +329,25 @@ main {
 
 .ga-footer {
   flex-shrink: 0;
-  background-color: var(--ga-navy);
-  color: rgba(255, 255, 255, 0.6);
-  padding: 2rem 0;
+  background-color: var(--ga-blue);
+  color: rgba(255, 255, 255, 0.75);
+  padding: 2.25rem 0;
   margin-top: 4rem;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
 }
 
 .ga-footer .ga-footer-brand {
   color: #fff;
-  font-weight: 700;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.ga-footer a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.ga-footer a:hover {
+  text-decoration: underline;
 }
