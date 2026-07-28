@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Not Allowed";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <h1 class="ga-page-title">You don't have access to that</h1>
+        <p class="ga-page-sub">
+            You're signed in as @User.Identity!.Name, and that page needs a different
+            level of access. If you think that's wrong, ask whoever runs the shop's
+            accounts to check your role.
+        </p>
+
+        <div class="ga-panel">
+            <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Back to the home page</a>
+            <a class="btn btn-outline-secondary ms-2" asp-controller="Appointments" asp-action="Manage">Go to the schedule</a>
+        </div>
+    </div>
+</div>

@@ -5,8 +5,13 @@ namespace Gregs_Auto.Domain.Implementations.Interfaces;
 // Business-logic contract for scheduling.
 public interface IAppointmentLogic
 {
-    // All appointments with Vehicle/Customer/Service eager-loaded, soonest first.
+    // Appointments from the start of today onwards, excluding cancelled ones —
+    // i.e. the slots that are actually spoken for. Soonest first.
     Task<IList<Appointment>> GetUpcomingAsync();
+
+    // Every appointment regardless of date or status, for the staff management
+    // board. Completed and cancelled work has to stay visible there.
+    Task<IList<Appointment>> GetScheduleAsync();
 
     // Book a new appointment. Validates the vehicle and service exist and that
     // the slot isn't already taken before creating anything.

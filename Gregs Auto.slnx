@@ -2,4 +2,5 @@
   <Project Path="Gregs Auto.Domain/Gregs Auto.Domain.csproj" />
   <Project Path="Gregs Auto.DAL/Gregs Auto.DAL.csproj" />
   <Project Path="Gregs Auto/Gregs Auto.csproj" />
+  <Project Path="Gregs Auto.Tests/Gregs Auto.Tests.csproj" />
 </Solution>

@@ -18,4 +18,15 @@ public class AppointmentRepository : GenericRepository<GregsAutoContext, Appoint
             .OrderBy(a => a.ScheduledAt)
             .ToListAsync();
     }
+
+    public async Task<IList<Appointment>> GetActiveBetweenAsync(DateTime fromInclusive, DateTime toExclusive)
+    {
+        return await Context.Appointments
+            .Include(a => a.Service)
+            .Where(a => a.ScheduledAt >= fromInclusive
+                     && a.ScheduledAt < toExclusive
+                     && a.Status != AppointmentStatus.Cancelled)
+            .OrderBy(a => a.ScheduledAt)
+            .ToListAsync();
+    }
 }

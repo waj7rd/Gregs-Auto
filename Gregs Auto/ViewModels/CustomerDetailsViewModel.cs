@@ -8,6 +8,7 @@ public class CustomerDetailsViewModel
     public string FullName { get; set; } = string.Empty;
     public string? Email { get; set; }
     public string? Phone { get; set; }
+    public bool IsActive { get; set; } = true;
 
     public List<VehicleRowViewModel> Vehicles { get; set; } = new();
 
@@ -15,7 +16,6 @@ public class CustomerDetailsViewModel
     // was typed alongside the per-field validation messages.
     public CreateVehicleViewModel NewVehicle { get; set; } = new();
 
-    // Set when an operation fails for a reason that isn't field-level,
-    // e.g. a delete blocked by existing appointment history.
+    // Set when an operation fails for a reason that isn't field-level.
     public string? ErrorMessage { get; set; }
 }

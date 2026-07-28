@@ -1,0 +1,70 @@
+@using Gregs_Auto.ViewModels
+@model List<LoginActivityRowViewModel>
+
+@{
+    ViewData["Title"] = "Sign-in Activity";
+}
+
+<div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+        <h1 class="ga-page-title mb-0">Sign-in Activity</h1>
+        <p class="ga-page-sub mb-0">The last @Model.Count attempts, newest first. Times are local.</p>
+    </div>
+    <a class="btn btn-outline-secondary" asp-controller="Staff" asp-action="Index">Back to staff</a>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">Nothing recorded yet.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>When</th>
+                    <th>Email used</th>
+                    <th>Account</th>
+                    <th>Result</th>
+                    <th>From</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model)
+                {
+                    <tr>
+                        <td class="text-nowrap">@row.OccurredAt.ToLocalTime().ToString("MMM d, h:mm:ss tt")</td>
+                        <td>@row.EmailAttempted</td>
+                        <td>
+                            @if (row.UserFullName != null)
+                            {
+                                @row.UserFullName
+                            }
+                            else
+                            {
+                                <span class="text-danger small">no such account</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge @(row.Event == "Success" ? "text-bg-success"
+                                               : row.Event == "Logout" ? "text-bg-secondary"
+                                               : row.Event == "PasswordChanged" ? "text-bg-info"
+                                               : row.Event == "LockedOut" ? "text-bg-danger"
+                                               : "text-bg-warning")">@row.Event</span>
+                        </td>
+                        <td class="text-muted small">@(row.IpAddress ?? "—")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="ga-panel mt-3">
+        <p class="mb-0 small text-muted">
+            Rows marked <strong>no such account</strong> are attempts against an email address
+            that doesn't exist here. A handful is someone mistyping. A run of them from one
+            address is someone guessing.
+        </p>
+    </div>
+}

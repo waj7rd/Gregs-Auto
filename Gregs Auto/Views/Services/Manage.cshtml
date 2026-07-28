@@ -1,0 +1,75 @@
+@using Gregs_Auto.ViewModels
+@model ServiceCatalogViewModel
+
+@{
+    ViewData["Title"] = "Service Catalog";
+}
+
+<div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+        <h1 class="ga-page-title mb-0">Service Catalog</h1>
+        <p class="ga-page-sub mb-0">What you offer, what it costs, and how long to allow for it.</p>
+    </div>
+    <div class="text-nowrap">
+        <a class="btn btn-outline-secondary" asp-action="Index">View public price list</a>
+        <a class="btn btn-primary ms-2" asp-action="Create">Add a service</a>
+    </div>
+</div>
+
+@if (Model.SuccessMessage != null)
+{
+    <div class="alert alert-success">@Model.SuccessMessage</div>
+}
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Description</th>
+                <th class="text-end">Time</th>
+                <th class="text-end">Price</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model.Services)
+            {
+                <tr class="@(s.IsActive ? "" : "text-muted")">
+                    <td><strong>@s.Name</strong></td>
+                    <td class="small">@(string.IsNullOrWhiteSpace(s.Description) ? "—" : s.Description)</td>
+                    <td class="text-end text-nowrap">@s.EstimatedDurationMinutes min</td>
+                    <td class="text-end text-nowrap">@(s.Price > 0 ? s.Price.ToString("C") : "Free")</td>
+                    <td>
+                        <span class="badge @(s.IsActive ? "text-bg-success" : "text-bg-secondary")">
+                            @(s.IsActive ? "Bookable" : "Archived")
+                        </span>
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@s.Id">Edit</a>
+                        <form asp-action="SetActive" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@s.Id" />
+                            <input type="hidden" name="isActive" value="@((!s.IsActive).ToString())" />
+                            <button type="submit" class="btn btn-sm @(s.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                                @(s.IsActive ? "Archive" : "Restore")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="ga-panel mt-3">
+    <p class="mb-0 small text-muted">
+        Services are archived rather than deleted, because every appointment ever booked
+        against one still points at it. An archived service disappears from the booking
+        form; jobs already on the books keep showing it.
+    </p>
+</div>

@@ -1,0 +1,131 @@
+@using Gregs_Auto.ViewModels
+@model BookingRequestsViewModel
+
+@{
+    ViewData["Title"] = "Booking Requests";
+}
+
+<div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+        <h1 class="ga-page-title mb-0">Booking Requests</h1>
+        <p class="ga-page-sub mb-0">
+            Asked for from the website. Nothing here is on the schedule until you accept it.
+        </p>
+    </div>
+    <a class="btn btn-outline-secondary" asp-controller="Appointments" asp-action="Manage">Go to the schedule</a>
+</div>
+
+@if (Model.SuccessMessage != null)
+{
+    <div class="alert alert-success">@Model.SuccessMessage</div>
+}
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+@if (!Model.Pending.Any())
+{
+    <div class="ga-panel">
+        <p class="mb-0 text-muted">Nothing waiting. Anything new from the website turns up here.</p>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Asked for</th>
+                    <th>Who</th>
+                    <th>Vehicle</th>
+                    <th>Service</th>
+                    <th>Notes</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Pending)
+                {
+                    <tr>
+                        <td class="text-nowrap">
+                            <strong>@r.RequestedAt.ToString("MMM d, h:mm tt")</strong>
+                            <div class="text-muted small">sent @r.CreatedAt.ToLocalTime().ToString("MMM d, h:mm tt")</div>
+                        </td>
+                        <td>
+                            @r.CustomerName
+                            <div class="text-muted small">
+                                <a href="tel:@r.Phone">@r.Phone</a>
+                                @if (!string.IsNullOrWhiteSpace(r.Email))
+                                {
+                                    <text><br />@r.Email</text>
+                                }
+                            </div>
+                        </td>
+                        <td>@r.VehicleDescription</td>
+                        <td>@r.ServiceName</td>
+                        <td class="small">@(string.IsNullOrWhiteSpace(r.Notes) ? "—" : r.Notes)</td>
+                        <td class="text-end text-nowrap">
+                            <form asp-action="AcceptRequest" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@r.Id" />
+                                <button type="submit" class="btn btn-sm btn-primary">Accept &amp; book</button>
+                            </form>
+                            <form asp-action="DeclineRequest" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@r.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Decline</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="ga-panel mt-3">
+        <p class="mb-0 small text-muted">
+            Accepting adds the customer and vehicle to your records and puts the job on
+            the schedule. If the phone number already matches a customer on file, it's
+            attached to them instead of creating a duplicate.
+        </p>
+    </div>
+}
+
+@if (Model.RecentlyHandled.Any())
+{
+    <h2 class="h5 mt-5 mb-3">Already dealt with</h2>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Asked for</th>
+                    <th>Who</th>
+                    <th>Vehicle</th>
+                    <th>Service</th>
+                    <th>Outcome</th>
+                    <th>By</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.RecentlyHandled)
+                {
+                    <tr class="text-muted">
+                        <td class="text-nowrap">@r.RequestedAt.ToString("MMM d, h:mm tt")</td>
+                        <td>@r.CustomerName</td>
+                        <td>@r.VehicleDescription</td>
+                        <td>@r.ServiceName</td>
+                        <td>
+                            <span class="badge @(r.Status == "Accepted" ? "text-bg-success" : "text-bg-secondary")">@r.Status</span>
+                        </td>
+                        <td class="small">
+                            @(r.HandledByName ?? "—")
+                            @if (r.HandledAt.HasValue)
+                            {
+                                <div>@r.HandledAt.Value.ToLocalTime().ToString("MMM d, h:mm tt")</div>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -6,7 +6,11 @@
 }
 
 <h1 class="ga-page-title">Book a Service</h1>
-<p class="ga-page-sub">Pick your vehicle and the work you need, then choose a time.</p>
+<p class="ga-page-sub">
+    @(Model.ShowCustomerDetail
+        ? "Book straight onto the schedule for a customer already on file."
+        : "Tell us about your vehicle and when suits you, and we'll confirm by phone.")
+</p>
 
 @if (Model.ErrorMessage != null)
 {
@@ -16,15 +20,95 @@
 <div class="row g-4">
     <div class="col-lg-5">
         <div class="ga-panel">
-            <h2 class="h5 mb-3">Appointment details</h2>
+            <h2 class="h5 mb-3">@(Model.ShowCustomerDetail ? "Appointment details" : "Your details")</h2>
 
-            @if (!Model.Vehicles.Any())
-            {
-                <p class="text-muted mb-0">No vehicles on file yet &mdash; a staff member needs to add your vehicle first.</p>
-            }
-            else if (!Model.Services.Any())
+            @if (!Model.Services.Any())
             {
                 <p class="text-muted mb-0">No services in the catalog yet.</p>
+            }
+            else if (!Model.ShowCustomerDetail)
+            {
+                @* Public form. A visitor has no account, so they describe
+                   themselves and their car rather than picking from the
+                   shop's records. *@
+                <form asp-controller="Appointments" asp-action="SubmitRequest" method="post" class="row g-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    @* Honeypot. Off-screen rather than display:none — some bots
+                       skip hidden fields, but almost none check position. Not a
+                       tab stop and not announced to screen readers, so a real
+                       person never touches it. *@
+                    <div class="ga-hp" aria-hidden="true">
+                        <label asp-for="Guest.Website">Website</label>
+                        <input asp-for="Guest.Website" tabindex="-1" autocomplete="off" />
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Guest.CustomerName" class="form-label"></label>
+                        <input asp-for="Guest.CustomerName" class="form-control" />
+                        <span asp-validation-for="Guest.CustomerName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="Guest.Phone" class="form-label"></label>
+                        <input asp-for="Guest.Phone" class="form-control" />
+                        <span asp-validation-for="Guest.Phone" class="text-danger small"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="Guest.Email" class="form-label"></label>
+                        <input asp-for="Guest.Email" class="form-control" />
+                        <span asp-validation-for="Guest.Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-4">
+                        <label asp-for="Guest.VehicleYear" class="form-label"></label>
+                        <input asp-for="Guest.VehicleYear" class="form-control" />
+                        <span asp-validation-for="Guest.VehicleYear" class="text-danger small"></span>
+                    </div>
+                    <div class="col-4">
+                        <label asp-for="Guest.VehicleMake" class="form-label"></label>
+                        <input asp-for="Guest.VehicleMake" class="form-control" placeholder="Ford" />
+                        <span asp-validation-for="Guest.VehicleMake" class="text-danger small"></span>
+                    </div>
+                    <div class="col-4">
+                        <label asp-for="Guest.VehicleModel" class="form-label"></label>
+                        <input asp-for="Guest.VehicleModel" class="form-control" placeholder="F-150" />
+                        <span asp-validation-for="Guest.VehicleModel" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Guest.ServiceId" class="form-label"></label>
+                        <select asp-for="Guest.ServiceId" class="form-select">
+                            <option value="">Choose a service&hellip;</option>
+                            @foreach (var s in Model.Services)
+                            {
+                                <option value="@s.Id">@s.Name (@s.EstimatedDurationMinutes min, @s.Price.ToString("C"))</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Guest.ServiceId" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Guest.RequestedAt" class="form-label"></label>
+                        <input asp-for="Guest.RequestedAt" type="datetime-local" class="form-control" />
+                        <span asp-validation-for="Guest.RequestedAt" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Guest.Notes" class="form-label"></label>
+                        <textarea asp-for="Guest.Notes" class="form-control" rows="3"
+                                  placeholder="Noises, warning lights, drop-off preferences..."></textarea>
+                        <span asp-validation-for="Guest.Notes" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary w-100">Request this appointment</button>
+                        <p class="form-text mb-0 mt-2">
+                            We'll call to confirm before it's on the books.
+                        </p>
+                    </div>
+                </form>
+            }
+            else if (!Model.Vehicles.Any())
+            {
+                <p class="text-muted mb-0">No vehicles on file yet &mdash; add a customer and vehicle first.</p>
             }
             else
             {
@@ -34,7 +118,7 @@
                         <select class="form-select" name="vehicleId" id="vehicleId" required>
                             @foreach (var v in Model.Vehicles)
                             {
-                                <option value="@v.Id">@v.CustomerName &mdash; @v.Description</option>
+                                <option value="@v.Id">@(Model.ShowCustomerDetail ? $"{v.CustomerName} — {v.Description}" : v.Description)</option>
                             }
                         </select>
                     </div>
@@ -65,7 +149,7 @@
     </div>
 
     <div class="col-lg-7">
-        <h2 class="h5 mb-3">On the schedule</h2>
+        <h2 class="h5 mb-3">@(Model.ShowCustomerDetail ? "On the schedule" : "Times already booked")</h2>
 
         @if (!Model.UpcomingAppointments.Any())
         {
@@ -78,8 +162,11 @@
                     <thead>
                         <tr>
                             <th>When</th>
-                            <th>Customer</th>
-                            <th>Vehicle</th>
+                            @if (Model.ShowCustomerDetail)
+                            {
+                                <th>Customer</th>
+                                <th>Vehicle</th>
+                            }
                             <th>Service</th>
                             <th>Status</th>
                         </tr>
@@ -89,8 +176,11 @@
                         {
                             <tr>
                                 <td class="text-nowrap">@a.ScheduledAt.ToString("MMM d, h:mm tt")</td>
-                                <td>@a.CustomerName</td>
-                                <td>@a.VehicleDescription</td>
+                                @if (Model.ShowCustomerDetail)
+                                {
+                                    <td>@a.CustomerName</td>
+                                    <td>@a.VehicleDescription</td>
+                                }
                                 <td>@a.ServiceName</td>
                                 <td>
                                     <span class="badge @(a.Status == "Scheduled" ? "text-bg-primary"
@@ -106,3 +196,7 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

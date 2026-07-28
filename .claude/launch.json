@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "gregs-auto",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "Gregs Auto/Gregs Auto.csproj", "--launch-profile", "http"],
+      "port": 5020
+    }
+  ]
+}

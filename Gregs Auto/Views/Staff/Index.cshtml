@@ -1,0 +1,110 @@
+@using Gregs_Auto.ViewModels
+@model StaffListViewModel
+
+@{
+    ViewData["Title"] = "Staff";
+}
+
+<div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+        <h1 class="ga-page-title mb-0">Staff</h1>
+        <p class="ga-page-sub mb-0">Who can sign in, and what they're allowed to do.</p>
+    </div>
+    <div class="text-nowrap">
+        <a class="btn btn-outline-secondary" asp-controller="Staff" asp-action="Activity">Sign-in activity</a>
+        <a class="btn btn-primary ms-2" asp-controller="Staff" asp-action="Create">Add staff member</a>
+    </div>
+</div>
+
+@if (Model.SuccessMessage != null)
+{
+    <div class="alert alert-success">@Model.SuccessMessage</div>
+}
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Last signed in</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model.Staff)
+            {
+                <tr class="@(s.IsActive ? "" : "text-muted")">
+                    <td>
+                        @s.FullName
+                        @if (s.IsCurrentUser)
+                        {
+                            <span class="badge text-bg-light ms-1">you</span>
+                        }
+                    </td>
+                    <td>@s.Email</td>
+                    <td>
+                        <span class="badge @(s.Role == "Admin" ? "text-bg-primary"
+                                           : s.Role == "Manager" ? "text-bg-info"
+                                           : "text-bg-secondary")">@s.Role</span>
+                    </td>
+                    <td>
+                        @if (!s.IsActive)
+                        {
+                            <span class="badge text-bg-secondary">Deactivated</span>
+                        }
+                        else if (s.IsLockedOut)
+                        {
+                            <span class="badge text-bg-warning">Locked out</span>
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-success">Active</span>
+                        }
+                    </td>
+                    <td class="text-nowrap">
+                        @(s.LastLoginAt.HasValue ? s.LastLoginAt.Value.ToLocalTime().ToString("MMM d, h:mm tt") : "Never")
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@s.UserId">Edit</a>
+                        <a class="btn btn-sm btn-outline-secondary" asp-action="ResetPassword" asp-route-id="@s.UserId">Reset password</a>
+
+                        @if (s.IsLockedOut)
+                        {
+                            <form asp-action="Unlock" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@s.UserId" />
+                                <button type="submit" class="btn btn-sm btn-warning">Unlock</button>
+                            </form>
+                        }
+
+                        @if (!s.IsCurrentUser)
+                        {
+                            <form asp-action="SetActive" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@s.UserId" />
+                                <input type="hidden" name="isActive" value="@((!s.IsActive).ToString())" />
+                                <button type="submit" class="btn btn-sm @(s.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                                    @(s.IsActive ? "Deactivate" : "Reactivate")
+                                </button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="ga-panel mt-4">
+    <h2 class="h6 mb-2">What the roles mean</h2>
+    <ul class="mb-0 small text-muted">
+        <li><strong>Admin</strong> &mdash; everything, including these staff accounts.</li>
+        <li><strong>Manager</strong> &mdash; everything except staff accounts.</li>
+        <li><strong>Technician</strong> &mdash; the schedule and customer records, read-only on customers. Can start, complete, and cancel jobs.</li>
+    </ul>
+</div>

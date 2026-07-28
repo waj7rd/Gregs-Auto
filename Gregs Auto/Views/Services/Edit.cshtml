@@ -1,0 +1,8 @@
+@using Gregs_Auto.ViewModels
+@model EditServiceViewModel
+
+@{
+    ViewData["Title"] = "Edit Service";
+}
+
+@await Html.PartialAsync("_ServiceForm", Model)

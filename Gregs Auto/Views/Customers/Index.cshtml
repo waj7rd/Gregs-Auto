@@ -1,19 +1,32 @@
 @using Gregs_Auto.ViewModels
-@model List<CustomerRowViewModel>
+@model CustomerListViewModel
 
 @{
     ViewData["Title"] = "Customers";
+    var active = Model.Customers.Count(c => c.IsActive);
+    var archived = Model.Customers.Count - active;
 }
 
 <div class="d-flex justify-content-between align-items-end mb-4">
     <div>
         <h1 class="ga-page-title">Customers</h1>
-        <p class="ga-page-sub mb-0">@Model.Count customer(s) on file.</p>
+        <p class="ga-page-sub mb-0">
+            @active on the books@(archived > 0 ? $", {archived} archived" : "").
+        </p>
     </div>
     <a class="btn btn-primary" asp-controller="Customers" asp-action="Create">Add Customer</a>
 </div>
 
-@if (!Model.Any())
+@if (Model.SuccessMessage != null)
+{
+    <div class="alert alert-success">@Model.SuccessMessage</div>
+}
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+@if (!Model.Customers.Any())
 {
     <p class="text-muted">No customers yet.</p>
 }
@@ -27,22 +40,44 @@ else
                     <th>Email</th>
                     <th>Phone</th>
                     <th class="text-end">Vehicles</th>
+                    <th class="text-end">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var c in Model)
+                @foreach (var c in Model.Customers)
                 {
-                    <tr>
+                    <tr class="@(c.IsActive ? "" : "text-muted")">
                         <td>
                             <a class="fw-semibold text-decoration-none"
                                asp-controller="Customers" asp-action="Details" asp-route-id="@c.Id">@c.FullName</a>
+                            @if (!c.IsActive)
+                            {
+                                <span class="badge text-bg-secondary ms-1">Archived</span>
+                            }
                         </td>
                         <td>@(c.Email ?? "—")</td>
                         <td>@(c.Phone ?? "—")</td>
                         <td class="text-end">@c.VehicleCount</td>
+                        <td class="text-end text-nowrap">
+                            <form asp-action="SetActive" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@c.Id" />
+                                <input type="hidden" name="isActive" value="@((!c.IsActive).ToString())" />
+                                <button type="submit" class="btn btn-sm @(c.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                                    @(c.IsActive ? "Archive" : "Restore")
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
+    </div>
+
+    <div class="ga-panel mt-3">
+        <p class="mb-0 small text-muted">
+            Customers are archived rather than deleted — their vehicles and every job
+            ever done on them stay on file. Archiving takes them off the working list
+            and takes their cars off the booking form.
+        </p>
     </div>
 }

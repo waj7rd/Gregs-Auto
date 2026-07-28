@@ -50,15 +50,28 @@
                                 <a class="@NavClass("Appointments", "Manage")" asp-controller="Appointments" asp-action="Manage">Schedule</a>
                             </li>
                             <li class="nav-item">
+                                <a class="@NavClass("Appointments", "Requests")" asp-controller="Appointments" asp-action="Requests">Requests</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="@NavClass("Customers")" asp-controller="Customers" asp-action="Index">Customers</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="@NavClass("Services", "Manage")" asp-controller="Services" asp-action="Manage">Catalog</a>
+                            </li>
+                            @if (User.IsInRole(Gregs_Auto.Domain.Security.Roles.Admin))
+                            {
+                                <li class="nav-item">
+                                    <a class="@NavClass("Staff")" asp-controller="Staff" asp-action="Index">Staff</a>
+                                </li>
+                            }
                         }
                     </ul>
                     <ul class="navbar-nav align-items-lg-center">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item me-lg-3">
-                                <span class="ga-user">@User.Identity!.Name</span>
+                                <a class="ga-user text-decoration-none" asp-controller="Account" asp-action="ChangePassword"
+                                   title="Change your password">@User.Identity!.Name</a>
                             </li>
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post">
