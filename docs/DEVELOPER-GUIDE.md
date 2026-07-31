@@ -320,6 +320,11 @@ gitignored scripts.
 minutes per IP, twenty sign-in attempts per five. You'll get a bare `429` with
 no friendly message and conclude something is broken. It isn't.
 
+**`datetime-local` inputs need `asp-format`.** A `DateTime` renders as
+`07/29/2026 09:00:00` by default, which the input silently rejects — the field
+just appears blank with no error anywhere. Use
+`asp-format="{0:yyyy-MM-ddTHH:mm}"`.
+
 **The honeypot returns success.** A bot filling the hidden `Website` field gets
 the normal thank-you page and writes nothing. If a submission "succeeds" but no
 row appears, check whether your test is filling every field on the form.

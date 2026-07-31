@@ -154,4 +154,52 @@ public class SmokeTests
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Contains("/Account/Denied", response.Headers.Location!.ToString());
     }
+
+    // ------------------------------------------------------- form defaults
+
+    [Fact]
+    public async Task The_booking_form_prefills_a_slot_the_rules_would_accept()
+    {
+        var html = await _app.CreateDirectClient().GetStringAsync("/Appointments/Schedule");
+
+        var value = System.Text.RegularExpressions.Regex.Match(
+            html, @"id=""Guest_RequestedAt""[^>]*value=""([^""]+)""").Groups[1].Value;
+
+        Assert.False(string.IsNullOrWhiteSpace(value),
+            "The date field rendered with no value. A DateTime formatted the default way is " +
+            "silently rejected by datetime-local — asp-format is required.");
+
+        // Must be the exact shape datetime-local accepts, or the browser blanks it.
+        var slot = DateTime.ParseExact(value, "yyyy-MM-ddTHH:mm", null);
+
+        Assert.True(slot > DateTime.Now, $"Prefilled {slot}, which is already in the past.");
+        Assert.DoesNotContain(slot.DayOfWeek, new[] { DayOfWeek.Saturday, DayOfWeek.Sunday });
+        Assert.InRange(slot.TimeOfDay, TimeSpan.FromHours(8), TimeSpan.FromHours(17));
+    }
+
+    [Fact]
+    public async Task The_prefilled_slot_can_actually_be_submitted()
+    {
+        var client = _app.CreateDirectClient();
+        var html = await client.GetStringAsync("/Appointments/Schedule");
+        var slot = System.Text.RegularExpressions.Regex.Match(
+            html, @"id=""Guest_RequestedAt""[^>]*value=""([^""]+)""").Groups[1].Value;
+
+        var response = await Web.PostFormAsync(client, "/Appointments/SubmitRequest", "/Appointments/Schedule",
+            new Dictionary<string, string>
+            {
+                ["CustomerName"] = "Prefill Check",
+                ["Phone"] = "555-0149",
+                ["VehicleYear"] = "2021",
+                ["VehicleMake"] = "Mazda",
+                ["VehicleModel"] = "CX-5",
+                ["ServiceId"] = "1",
+                ["RequestedAt"] = slot,
+            });
+
+        // The whole point: submitting the default unchanged must not produce an error.
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.True(response.StatusCode == HttpStatusCode.Redirect,
+            $"Submitting the prefilled default was refused: {Web.ExtractAlert(body) ?? "no message"}");
+    }
 }

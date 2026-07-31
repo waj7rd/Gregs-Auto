@@ -232,9 +232,17 @@ public class AppointmentsController : Controller
         var services = await _serviceLogic.GetActiveAsync();
         var appointments = await _appointmentLogic.GetUpcomingAsync();
 
+        // Prefill the date field with a slot the rules would accept, rather
+        // than leaving it empty. On a redisplay after a validation error the
+        // caller overwrites Guest with what the visitor typed, so their input
+        // isn't lost.
+        var defaultSlot = _appointmentLogic.NextBookableSlot();
+
         return new ScheduleAppointmentViewModel
         {
             ShowCustomerDetail = includeCustomerDetail,
+            DefaultSlot = defaultSlot,
+            Guest = { RequestedAt = defaultSlot },
             Vehicles = vehicles.Select(v => new VehicleOptionViewModel
             {
                 Id = v.VehicleId,

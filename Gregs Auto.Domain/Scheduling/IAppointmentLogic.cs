@@ -17,6 +17,9 @@ public interface IAppointmentLogic
     // the slot isn't already taken before creating anything.
     Task<AppointmentResult> BookAsync(int vehicleId, int serviceId, DateTime scheduledAt, string? notes);
 
+    // The next slot the shop could actually take, for prefilling a date field.
+    DateTime NextBookableSlot();
+
     // Scheduled -> InProgress. No-ops if the appointment isn't Scheduled.
     Task StartAsync(int appointmentId);
 

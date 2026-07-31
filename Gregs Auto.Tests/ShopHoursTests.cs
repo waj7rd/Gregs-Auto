@@ -197,3 +197,76 @@ public class ArchivingTests
         Assert.Single(await Logic().GetScheduleAsync());
     }
 }
+
+// The default that prefills the booking form. It has to be a slot the rules
+// would actually accept — a default that's immediately rejected makes the
+// customer fix an error they didn't cause.
+public class NextOpenSlotTests
+{
+    private static readonly TestShopSettings Shop = new(
+        opensAt: new TimeOnly(8, 0),
+        closesAt: new TimeOnly(17, 0),
+        closedDays: new[] { DayOfWeek.Saturday, DayOfWeek.Sunday });
+
+    // 2026-07-15 is a Wednesday, 2026-07-17 a Friday, 2026-07-18 a Saturday.
+    private static DateTime At(int day, int hour, int minute = 0) => new(2026, 7, day, hour, minute, 0);
+
+    [Fact]
+    public void Mid_morning_rounds_up_to_the_next_half_hour()
+    {
+        Assert.Equal(At(15, 10, 30), ShopHours.NextOpenSlot(Shop, At(15, 10, 12)));
+    }
+
+    [Fact]
+    public void An_exact_half_hour_is_left_alone()
+    {
+        Assert.Equal(At(15, 10, 30), ShopHours.NextOpenSlot(Shop, At(15, 10, 30)));
+    }
+
+    [Fact]
+    public void Before_opening_gives_opening_time_today()
+    {
+        Assert.Equal(At(15, 8, 0), ShopHours.NextOpenSlot(Shop, At(15, 6, 20)));
+    }
+
+    [Fact]
+    public void After_closing_rolls_to_the_next_morning()
+    {
+        Assert.Equal(At(16, 8, 0), ShopHours.NextOpenSlot(Shop, At(15, 17, 30)));
+    }
+
+    [Fact]
+    public void Friday_evening_skips_the_weekend()
+    {
+        Assert.Equal(At(20, 8, 0), ShopHours.NextOpenSlot(Shop, At(17, 18, 0)));   // Mon 20th
+    }
+
+    [Fact]
+    public void Saturday_gives_monday()
+    {
+        Assert.Equal(At(20, 8, 0), ShopHours.NextOpenSlot(Shop, At(18, 10, 0)));
+    }
+
+    [Fact]
+    public void A_shop_closed_every_day_gives_up_rather_than_spinning()
+    {
+        var never = new TestShopSettings(closedDays: Enum.GetValues<DayOfWeek>());
+
+        var slot = ShopHours.NextOpenSlot(never, At(15, 10, 0));
+
+        Assert.True(slot > At(15, 10, 0));   // returned something, didn't hang
+    }
+
+    [Fact]
+    public void The_default_always_passes_the_hours_check()
+    {
+        // The property that actually matters: whatever we prefill, the rules
+        // must accept it for a short job.
+        foreach (var day in Enumerable.Range(13, 10))
+        foreach (var hour in new[] { 0, 7, 9, 12, 16, 17, 23 })
+        {
+            var slot = ShopHours.NextOpenSlot(Shop, At(day, hour));
+            Assert.Null(ShopHours.Check(Shop, slot, 30));
+        }
+    }
+}

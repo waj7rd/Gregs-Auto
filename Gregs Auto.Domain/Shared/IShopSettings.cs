@@ -63,4 +63,49 @@ public static class ShopHours
     }
 
     private static string Describe(TimeOnly time) => time.ToString("h:mm tt").ToLowerInvariant();
+
+    // The next moment the shop could actually take a booking, used to prefill
+    // the date field rather than leaving it empty.
+    //
+    // Deliberately not "now": now is in the past by the time the form posts,
+    // and it may be 3am on a Sunday. A default the rules would immediately
+    // reject is worse than no default — the customer fixes an error they didn't
+    // cause.
+    //
+    // Rounds up to the next half hour, because nobody books at 10:37.
+    public static DateTime NextOpenSlot(IShopSettings settings, DateTime from)
+    {
+        var slot = RoundUpToHalfHour(from);
+
+        // Two weeks is far more than enough to find an open day, and stops a
+        // shop configured as closed every day spinning forever.
+        for (var attempt = 0; attempt < 14; attempt++)
+        {
+            var day = slot.Date;
+
+            if (!settings.ClosedDays.Contains(day.DayOfWeek))
+            {
+                var opens = day + settings.OpensAt.ToTimeSpan();
+                var closes = day + settings.ClosesAt.ToTimeSpan();
+
+                if (slot < opens)
+                    return opens;
+
+                if (slot < closes)
+                    return slot;
+            }
+
+            // Too late today, or closed today — try tomorrow from opening.
+            slot = day.AddDays(1) + settings.OpensAt.ToTimeSpan();
+        }
+
+        return slot;
+    }
+
+    private static DateTime RoundUpToHalfHour(DateTime value)
+    {
+        var half = TimeSpan.FromMinutes(30);
+        var ticks = (value.Ticks + half.Ticks - 1) / half.Ticks * half.Ticks;
+        return new DateTime(ticks, value.Kind);
+    }
 }

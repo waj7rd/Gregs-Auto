@@ -88,7 +88,15 @@
                     </div>
                     <div class="col-12">
                         <label asp-for="Guest.RequestedAt" class="form-label"></label>
-                        <input asp-for="Guest.RequestedAt" type="datetime-local" class="form-control" />
+                        @* asp-format is required: a DateTime renders as "07/29/2026 09:00:00"
+                           by default, which a datetime-local input silently rejects, leaving
+                           the field blank. *@
+                        <input asp-for="Guest.RequestedAt" type="datetime-local" class="form-control"
+                               asp-format="{0:yyyy-MM-ddTHH:mm}"
+                               min="@Model.DefaultSlot.ToString("yyyy-MM-ddTHH:mm")" />
+                        <div class="form-text">
+                            Prefilled with our next opening. Change it to whatever suits you.
+                        </div>
                         <span asp-validation-for="Guest.RequestedAt" class="text-danger small"></span>
                     </div>
                     <div class="col-12">
@@ -133,7 +141,9 @@
                     </div>
                     <div class="col-12">
                         <label class="form-label" for="scheduledAt">Date &amp; time</label>
-                        <input class="form-control" type="datetime-local" name="scheduledAt" id="scheduledAt" required />
+                        <input class="form-control" type="datetime-local" name="scheduledAt" id="scheduledAt" required
+                               value="@Model.DefaultSlot.ToString("yyyy-MM-ddTHH:mm")"
+                               min="@Model.DefaultSlot.ToString("yyyy-MM-ddTHH:mm")" />
                     </div>
                     <div class="col-12">
                         <label class="form-label" for="notes">Anything we should know?</label>

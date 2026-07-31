@@ -20,6 +20,10 @@ public class ScheduleAppointmentViewModel
     // The public form. Only populated (and only rendered) when anonymous.
     public GuestBookingViewModel Guest { get; set; } = new();
 
+    // The next slot the shop could take. Prefills the date field on both forms,
+    // and becomes the min attribute so a browser refuses anything earlier.
+    public DateTime DefaultSlot { get; set; }
+
     // Set when a booking attempt fails, e.g. slot already taken.
     public string? ErrorMessage { get; set; }
 }

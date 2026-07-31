@@ -48,6 +48,8 @@ public class AppointmentLogic : IAppointmentLogic
         return await _appointmentRepository.GetAllWithDetailsAsync();
     }
 
+    public DateTime NextBookableSlot() => ShopHours.NextOpenSlot(_settings, _clock.LocalNow);
+
     public async Task<AppointmentResult> BookAsync(int vehicleId, int serviceId, DateTime scheduledAt, string? notes)
     {
         // Compare against wall-clock time at the shop, not the server's clock —
