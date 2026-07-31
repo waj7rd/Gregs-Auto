@@ -161,3 +161,9 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+
+// Top-level statements compile to an internal Program class. The smoke tests
+// spin the real application up through WebApplicationFactory<Program>, which
+// needs to see it.
+public partial class Program { }
