@@ -194,7 +194,9 @@ public class BookingRequestLogicTests
                 ServiceId = OilChangeId,
                 ScheduledAt = Tomorrow(10),
                 Status = AppointmentStatus.Scheduled,
-                Service = _services.GetAll().First()
+                Service = _services.GetAll().First(),
+                DurationMinutes = 30,
+                Price = 49.99m
             });
         }
 
@@ -277,7 +279,9 @@ public class BookingRequestLogicTests
                 ServiceId = OilChangeId,
                 ScheduledAt = Tomorrow(10),
                 Status = AppointmentStatus.Scheduled,
-                Service = _services.GetAll().First()
+                Service = _services.GetAll().First(),
+                DurationMinutes = 30,
+                Price = 49.99m
             });
         }
 

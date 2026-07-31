@@ -115,6 +115,14 @@ public partial class GregsAutoContext
                 .HasConstraintName("FK_LoginAudit_Users");
         });
 
+        modelBuilder.Entity<Appointment>(entity =>
+        {
+            entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+
+            // Computed in C# from ScheduledAt + DurationMinutes.
+            entity.Ignore(e => e.EndsAt);
+        });
+
         modelBuilder.Entity<Service>(entity => entity.Property(e => e.IsActive)
             .HasDefaultValue(true)
             .HasAnnotation("Relational:DefaultConstraintName", "DF_Services_IsActive"));

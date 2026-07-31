@@ -46,7 +46,12 @@ public class AppointmentLogicTests
             ServiceId = serviceId,
             ScheduledAt = at,
             Status = status,
-            Service = service
+            Service = service,
+
+            // Mirrors what BookAsync does — the snapshot is what the overlap
+            // rules read, so a fixture without it occupies no time at all.
+            Price = service.Price,
+            DurationMinutes = service.EstimatedDurationMinutes
         });
     }
 
@@ -135,12 +140,13 @@ public class AppointmentLogicTests
     {
         var logic = Logic(bayCount: 3);
 
+        // No Existing() calls here — BookAsync writes into the same fake, so
+        // seeding as well would put six appointments in three bays. That used
+        // to pass only because a booked appointment had no Service navigation
+        // and so counted as zero minutes; now the snapshot makes it real.
         Assert.True((await logic.BookAsync(VehicleA, OilChangeId, Today(14), null)).Success);
-        Existing(VehicleA, OilChangeId, Today(14));
         Assert.True((await logic.BookAsync(VehicleB, OilChangeId, Today(14), null)).Success);
-        Existing(VehicleB, OilChangeId, Today(14));
         Assert.True((await logic.BookAsync(VehicleC, OilChangeId, Today(14), null)).Success);
-        Existing(VehicleC, OilChangeId, Today(14));
 
         var fourth = await logic.BookAsync(VehicleD, OilChangeId, Today(14), null);
 
@@ -252,5 +258,99 @@ public class AppointmentLogicTests
 
         Assert.Single(await Logic().GetUpcomingAsync());
         Assert.Equal(2, (await Logic().GetScheduleAsync()).Count);
+    }
+}
+
+// Changing the catalogue must not rewrite what has already been booked. This is
+// the whole reason price and duration are copied onto the appointment.
+public class PriceSnapshotTests
+{
+    private const int OilChangeId = 1;
+    private const int VehicleA = 1;
+    private const int VehicleB = 2;
+
+    private readonly FakeAppointmentRepository _appointments = new();
+    private readonly FakeVehicleRepository _vehicles = new();
+    private readonly FakeServiceRepository _services = new();
+    private readonly TestClock _clock = new();
+    private readonly Service _oilChange;
+
+    public PriceSnapshotTests()
+    {
+        _oilChange = new Service
+        {
+            ServiceId = OilChangeId,
+            Name = "Oil Change",
+            EstimatedDurationMinutes = 30,
+            Price = 49.99m
+        };
+
+        _services.Seed(_oilChange);
+        _vehicles.Seed(new Vehicle { VehicleId = VehicleA }, new Vehicle { VehicleId = VehicleB });
+    }
+
+    private AppointmentLogic Logic(int bayCount = 3) =>
+        new(_appointments, _vehicles, _services, _clock, new TestShopSettings(bayCount));
+
+    private static DateTime At(int hour, int minute = 0) => new(2026, 7, 15, hour, minute, 0);
+
+    [Fact]
+    public async Task Booking_records_the_price_and_duration_of_the_day()
+    {
+        await Logic().BookAsync(VehicleA, OilChangeId, At(14), null);
+
+        var booked = _appointments.GetAll().Single();
+        Assert.Equal(49.99m, booked.Price);
+        Assert.Equal(30, booked.DurationMinutes);
+    }
+
+    [Fact]
+    public async Task Raising_the_price_does_not_restate_a_booked_job()
+    {
+        await Logic().BookAsync(VehicleA, OilChangeId, At(14), null);
+
+        _oilChange.Price = 54.99m;   // the shop puts its prices up
+
+        Assert.Equal(49.99m, _appointments.GetAll().Single().Price);
+    }
+
+    [Fact]
+    public async Task Lengthening_a_service_does_not_reshuffle_an_existing_booking()
+    {
+        // A 30-minute job at 14:00 occupies 14:00-14:30, so 14:30 is free.
+        await Logic().BookAsync(VehicleA, OilChangeId, At(14), null);
+
+        // The shop decides oil changes really take 90 minutes.
+        _oilChange.EstimatedDurationMinutes = 90;
+
+        // The existing booking still occupies only its original half hour, so a
+        // one-bay shop can still take the 14:30 slot. Reading the catalogue
+        // instead would have made 14:00 run to 15:30 and refused this.
+        var result = await Logic(bayCount: 1).BookAsync(VehicleB, OilChangeId, At(14, 30), null);
+
+        Assert.True(result.Success, result.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task A_new_booking_picks_up_the_new_price()
+    {
+        // 10:00, not 9:00 — the pinned clock is 9:00, so a 9:00 booking isn't
+        // in the future and would be refused before price came into it.
+        await Logic().BookAsync(VehicleA, OilChangeId, At(10), null);
+        _oilChange.Price = 54.99m;
+        await Logic().BookAsync(VehicleB, OilChangeId, At(14), null);
+
+        var prices = _appointments.GetAll().OrderBy(a => a.ScheduledAt).Select(a => a.Price).ToList();
+
+        Assert.Equal(new[] { 49.99m, 54.99m }, prices);
+    }
+
+    [Fact]
+    public async Task EndsAt_comes_from_the_snapshot()
+    {
+        await Logic().BookAsync(VehicleA, OilChangeId, At(14), null);
+        _oilChange.EstimatedDurationMinutes = 240;
+
+        Assert.Equal(At(14, 30), _appointments.GetAll().Single().EndsAt);
     }
 }

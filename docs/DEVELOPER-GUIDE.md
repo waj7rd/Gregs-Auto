@@ -51,6 +51,7 @@ before it.
 | 8 | `SeedShops.sql` | Two more shops (data only — see the notes) |
 | 9 | `AddShopScoping.sql` | `ShopId` on every tenant-scoped table |
 | 10 | `FixShopIdDefaults.sql` | **Required.** Without it every INSERT fails |
+| 11 | `AddAppointmentSnapshot.sql` | Price and duration copied onto each appointment |
 
 Two optional extras:
 

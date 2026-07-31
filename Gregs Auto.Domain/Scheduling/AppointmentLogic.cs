@@ -90,6 +90,12 @@ public class AppointmentLogic : IAppointmentLogic
             ScheduledAt = scheduledAt,
             Status = AppointmentStatus.Scheduled,
             Notes = notes,
+
+            // Copied, not referenced. Editing the service afterwards must not
+            // change what this job cost or how long it was booked for.
+            Price = service.Price,
+            DurationMinutes = service.EstimatedDurationMinutes,
+
             CreatedAt = _clock.UtcNow
         };
 
@@ -120,8 +126,11 @@ public class AppointmentLogic : IAppointmentLogic
         var candidates = await _appointmentRepository.GetActiveBetweenAsync(
             start.AddMinutes(-maxDuration), end);
 
+        // Each existing appointment's own duration, not whatever its service
+        // says today. Otherwise editing a service silently reshuffles a
+        // schedule that has already been agreed with people.
         var overlapping = candidates
-            .Where(a => Overlaps(a.ScheduledAt, a.Service?.EstimatedDurationMinutes ?? 0, start, end))
+            .Where(a => Overlaps(a.ScheduledAt, a.DurationMinutes, start, end))
             .ToList();
 
         if (overlapping.Any(a => a.VehicleId == vehicleId))

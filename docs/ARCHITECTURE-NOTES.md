@@ -112,10 +112,12 @@ made `IUnitOfWork` silently useless — it opened a transaction on a context
 nobody else wrote through, so nothing rolled back. The context is injected now.
 Do not reintroduce `new` there.
 
-**Prices are not snapshotted.** `Appointment` reads its price from `Service`, so
-changing a price silently restates what past jobs appear to have cost. Harmless
-for a schedule, disqualifying for invoicing. Fix before building invoicing, not
-after.
+**Prices are snapshotted.** `Appointment` carries its own `Price` and
+`DurationMinutes`, copied from the service when it was booked. Editing the
+catalogue no longer restates what past jobs cost, and no longer reshuffles a
+schedule that has already been agreed. The service name is deliberately not
+copied — it stays resolvable through the FK, and a rename is usually a
+correction you want history to reflect.
 
 **No per-record ownership checks.** Every action takes a bare `id`. Correct
 single-tenant; see the warning at the top.

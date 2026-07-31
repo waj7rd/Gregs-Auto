@@ -30,6 +30,7 @@ public static class TestDatabase
         "SeedShops.sql",
         "AddShopScoping.sql",
         "FixShopIdDefaults.sql",
+        "AddAppointmentSnapshot.sql",
     };
 
     public static void Rebuild()
