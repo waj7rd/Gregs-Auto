@@ -7,6 +7,19 @@ namespace Gregs_Auto.DAL.Context;
 
 // Loads and caches the shop record.
 //
+// ---------------------------------------------------------------------------
+// WARNING: this serves ONE shop. The application is not multi-tenant.
+//
+// Every table carries a ShopId and there are three rows in Shops, but nothing
+// reads them — there are no query filters and no tenant resolution. This
+// returns whichever shop has the lowest ShopId, and every query in the
+// application returns rows from every shop.
+//
+// Adding a staff account for a second shop would let them sign in and see the
+// first shop's customers. Nothing would error. See docs/ARCHITECTURE-NOTES.md
+// before touching this.
+// ---------------------------------------------------------------------------
+//
 // Registered as a singleton, so it takes a scope factory rather than a context
 // directly — a singleton holding a scoped DbContext is the classic captive
 // dependency, and it would hand every request the same stale, eventually
