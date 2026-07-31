@@ -52,8 +52,13 @@ before it.
 | 9 | `AddShopScoping.sql` | `ShopId` on every tenant-scoped table |
 | 10 | `FixShopIdDefaults.sql` | **Required.** Without it every INSERT fails |
 
-`RefreshDemoData.sql` is optional — run it before a demo to re-anchor the
-sample appointments to today.
+Two optional extras:
+
+- `RefreshDemoData.sql` — re-anchors the sample appointments to today. Run it
+  before a demo so the schedule doesn't look stale.
+- `SeedBookingRequests.sql` — five pending and two handled requests, so
+  `/Appointments/Requests` has something in it. Every pending one is valid
+  against the booking rules, so they can all actually be accepted.
 
 ### Run it
 
