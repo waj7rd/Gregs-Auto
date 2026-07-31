@@ -1,9 +1,8 @@
 using Gregs_Auto.Domain.EntityModels;
-using Gregs_Auto.Domain.Implementations.Interfaces;
+using Gregs_Auto.Domain.Shared;
 using Gregs_Auto.Domain.IRepositories;
-using Gregs_Auto.Domain.Security;
 
-namespace Gregs_Auto.Domain.Implementations;
+namespace Gregs_Auto.Domain.Identity;
 
 public class UserLogic : IUserLogic
 {

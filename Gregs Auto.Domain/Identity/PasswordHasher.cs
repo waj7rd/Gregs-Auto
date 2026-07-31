@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace Gregs_Auto.Domain.Implementations;
+namespace Gregs_Auto.Domain.Identity;
 
 // PBKDF2-SHA256 password hashing. No external Identity package — just the
 // standard .NET crypto primitives. Format: "v1.{iterations}.{saltB64}.{hashB64}",

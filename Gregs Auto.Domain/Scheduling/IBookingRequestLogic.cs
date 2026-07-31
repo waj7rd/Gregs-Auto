@@ -1,6 +1,6 @@
 using Gregs_Auto.Domain.EntityModels;
 
-namespace Gregs_Auto.Domain.Implementations.Interfaces;
+namespace Gregs_Auto.Domain.Scheduling;
 
 // Public booking requests, and turning them into real appointments.
 public interface IBookingRequestLogic

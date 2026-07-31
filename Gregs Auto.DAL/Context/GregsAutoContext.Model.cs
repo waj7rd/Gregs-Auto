@@ -12,8 +12,40 @@ public partial class GregsAutoContext
 
     public virtual DbSet<BookingRequest> BookingRequests { get; set; }
 
+    public virtual DbSet<Shop> Shops { get; set; }
+
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Shop>(entity =>
+        {
+            entity.ToTable("Shops");
+            entity.HasKey(e => e.ShopId).HasName("PK_Shops");
+
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Phone).HasMaxLength(30);
+            entity.Property(e => e.AddressLine).HasMaxLength(200);
+            entity.Property(e => e.City).HasMaxLength(100);
+            entity.Property(e => e.State).HasMaxLength(50);
+            entity.Property(e => e.PostalCode).HasMaxLength(20);
+            entity.Property(e => e.TimeZoneId).IsRequired().HasMaxLength(100);
+
+            entity.Property(e => e.ClosedDaysRaw)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("ClosedDays");
+
+            entity.Property(e => e.TierName)
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasColumnName("Tier");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+
+            // Computed in C# from ClosedDaysRaw / TierName — not columns.
+            entity.Ignore(e => e.ClosedDays);
+            entity.Ignore(e => e.Tier);
+        });
+
         modelBuilder.Entity<BookingRequest>(entity =>
         {
             entity.HasKey(e => e.BookingRequestId).HasName("PK_BookingRequests");

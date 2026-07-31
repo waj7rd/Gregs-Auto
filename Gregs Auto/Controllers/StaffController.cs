@@ -2,8 +2,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Gregs_Auto.Domain.EntityModels;
-using Gregs_Auto.Domain.Implementations.Interfaces;
-using Gregs_Auto.Domain.Security;
 using Gregs_Auto.ViewModels;
 
 namespace Gregs_Auto.Controllers;

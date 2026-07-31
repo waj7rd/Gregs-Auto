@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Gregs_Auto.Domain.Implementations.Interfaces;
 using Gregs_Auto.ViewModels;
 
 namespace Gregs_Auto.Controllers;

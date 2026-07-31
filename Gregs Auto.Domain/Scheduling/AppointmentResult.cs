@@ -1,4 +1,4 @@
-namespace Gregs_Auto.Domain.Implementations.Interfaces;
+namespace Gregs_Auto.Domain.Scheduling;
 
 // The outcome of a booking attempt. A customer needs to know WHY a booking
 // failed (bad vehicle/service, slot already taken, etc.) so the UI can show it.

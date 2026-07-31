@@ -58,7 +58,10 @@
                             <li class="nav-item">
                                 <a class="@NavClass("Services", "Manage")" asp-controller="Services" asp-action="Manage">Catalog</a>
                             </li>
-                            @if (User.IsInRole(Gregs_Auto.Domain.Security.Roles.Admin))
+                            <li class="nav-item">
+                                <a class="@NavClass("Settings")" asp-controller="Settings" asp-action="Index">Settings</a>
+                            </li>
+                            @if (User.IsInRole(Gregs_Auto.Domain.Identity.Roles.Admin))
                             {
                                 <li class="nav-item">
                                     <a class="@NavClass("Staff")" asp-controller="Staff" asp-action="Index">Staff</a>

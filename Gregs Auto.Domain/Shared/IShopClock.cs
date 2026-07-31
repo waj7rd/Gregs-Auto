@@ -1,4 +1,4 @@
-namespace Gregs_Auto.Domain.Implementations.Interfaces;
+namespace Gregs_Auto.Domain.Shared;
 
 // Supplies the current time to business logic. Two distinct notions, and the
 // difference matters:

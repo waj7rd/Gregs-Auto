@@ -1,8 +1,7 @@
 using Gregs_Auto.Domain.EntityModels;
-using Gregs_Auto.Domain.Implementations.Interfaces;
 using Gregs_Auto.Domain.IRepositories;
 
-namespace Gregs_Auto.Domain.Implementations;
+namespace Gregs_Auto.Domain.Catalog;
 
 public class ServiceLogic : IServiceLogic
 {

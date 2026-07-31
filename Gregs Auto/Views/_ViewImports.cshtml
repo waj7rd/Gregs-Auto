@@ -1,3 +1,11 @@
-﻿@using Gregs_Auto
+@using Gregs_Auto
 @using Gregs_Auto.Models
+@using Gregs_Auto.ViewModels
+@* Razor doesn't see the project's global usings, so the modules are imported
+   here instead of in every view that touches one. *@
+@using Gregs_Auto.Domain.Scheduling
+@using Gregs_Auto.Domain.Catalog
+@using Gregs_Auto.Domain.Identity
+@using Gregs_Auto.Domain.Shared
+@using Gregs_Auto.Domain.Licensing
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

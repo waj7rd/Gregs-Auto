@@ -1,6 +1,6 @@
 using Gregs_Auto.Domain.EntityModels;
 
-namespace Gregs_Auto.Domain.Implementations.Interfaces;
+namespace Gregs_Auto.Domain.Identity;
 
 // Business-logic contract for staff accounts: signing in, and managing who has
 // an account at all.

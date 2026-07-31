@@ -1,6 +1,6 @@
 using Gregs_Auto.Domain.EntityModels;
 
-namespace Gregs_Auto.Domain.Implementations.Interfaces;
+namespace Gregs_Auto.Domain.Scheduling;
 
 // Business-logic contract for scheduling.
 public interface IAppointmentLogic

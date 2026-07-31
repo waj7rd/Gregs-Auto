@@ -1,0 +1,132 @@
+@model ShopSettingsViewModel
+
+@{
+    ViewData["Title"] = "Shop Settings";
+}
+
+<div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+        <h1 class="ga-page-title mb-0">Shop Settings</h1>
+        <p class="ga-page-sub mb-0">How the shop runs. The booking rules read these directly.</p>
+    </div>
+    <span class="badge text-bg-primary">@Model.CurrentTier plan</span>
+</div>
+
+@if (Model.SuccessMessage != null)
+{
+    <div class="alert alert-success">@Model.SuccessMessage</div>
+}
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<form asp-controller="Settings" asp-action="Index" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="ga-panel h-100">
+                <h2 class="h5 mb-3">The shop</h2>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Phone" class="form-label"></label>
+                    <input asp-for="Phone" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="AddressLine" class="form-label"></label>
+                    <input asp-for="AddressLine" class="form-control" />
+                </div>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <label asp-for="City" class="form-label"></label>
+                        <input asp-for="City" class="form-control" />
+                    </div>
+                    <div class="col-3">
+                        <label asp-for="State" class="form-label"></label>
+                        <input asp-for="State" class="form-control" />
+                    </div>
+                    <div class="col-3">
+                        <label asp-for="PostalCode" class="form-label"></label>
+                        <input asp-for="PostalCode" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="ga-panel h-100">
+                <h2 class="h5 mb-3">Hours and capacity</h2>
+
+                <div class="mb-3">
+                    <label asp-for="TimeZoneId" class="form-label"></label>
+                    <select asp-for="TimeZoneId" class="form-select">
+                        @foreach (var (id, label) in ShopSettingsViewModel.TimeZoneChoices)
+                        {
+                            <option value="@id">@label</option>
+                        }
+                    </select>
+                    <div class="form-text">Every appointment time is judged against this clock.</div>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-4">
+                        <label asp-for="OpensAt" class="form-label"></label>
+                        <input asp-for="OpensAt" type="time" class="form-control" />
+                        <span asp-validation-for="OpensAt" class="text-danger small"></span>
+                    </div>
+                    <div class="col-4">
+                        <label asp-for="ClosesAt" class="form-label"></label>
+                        <input asp-for="ClosesAt" type="time" class="form-control" />
+                        <span asp-validation-for="ClosesAt" class="text-danger small"></span>
+                    </div>
+                    <div class="col-4">
+                        <label asp-for="BayCount" class="form-label">Bays</label>
+                        <input asp-for="BayCount" type="number" min="1" max="50" class="form-control" />
+                        <span asp-validation-for="BayCount" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="form-text mb-3">
+                    A job has to start after opening and be finished before closing —
+                    a 90-minute job won't take a 4:30 slot if you shut at 5.
+                    Bays is how many cars can be in at once before the system stops taking bookings.
+                </div>
+
+                <label class="form-label">@Html.DisplayNameFor(m => m.ClosedDays)</label>
+                <div class="d-flex flex-wrap gap-3">
+                    @foreach (var day in ShopSettingsViewModel.WeekDays)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="ClosedDays"
+                                   value="@day" id="closed-@day"
+                                   checked="@(Model.ClosedDays.Contains(day))" />
+                            <label class="form-check-label" for="closed-@day">@day</label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Save settings</button>
+        <a class="btn btn-outline-secondary ms-2" asp-controller="Appointments" asp-action="Manage">Cancel</a>
+    </div>
+</form>
+
+<div class="ga-panel mt-4">
+    <p class="mb-0 small text-muted">
+        Your plan is <strong>@Model.CurrentTier</strong>. That's set by your agreement rather than
+        from this page &mdash; get in touch if you want to change it.
+    </p>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

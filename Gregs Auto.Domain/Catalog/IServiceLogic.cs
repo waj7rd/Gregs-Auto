@@ -1,6 +1,6 @@
 using Gregs_Auto.Domain.EntityModels;
 
-namespace Gregs_Auto.Domain.Implementations.Interfaces;
+namespace Gregs_Auto.Domain.Catalog;
 
 // The service catalog. Prices and durations change — an oil change goes up a
 // dollar, a brake job turns out to take two hours — and none of that should

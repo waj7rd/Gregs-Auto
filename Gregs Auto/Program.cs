@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Gregs_Auto.DAL.Context;
 using Gregs_Auto.DAL.Repositories;
 using Gregs_Auto.Domain.IRepositories;
-using Gregs_Auto.Domain.Implementations;
-using Gregs_Auto.Domain.Implementations.Interfaces;
-using Gregs_Auto.Domain.Security;
+using Gregs_Auto.Domain.Licensing;
+using Gregs_Auto.Security;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +43,15 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     });
 
+// How the shop runs, and what it has paid for — both read from the Shops row
+// rather than from configuration, so the shop can change its own hours and bay
+// count from a screen. Cached; the settings screen calls Reload after saving.
+builder.Services.AddSingleton<IShopContext, ShopContextProvider>();
+builder.Services.AddSingleton<IShopSettings, ShopSettingsFromContext>();
+builder.Services.AddSingleton<IFeatureFlags, FeatureFlagsFromContext>();
+
+builder.Services.AddSingleton<IAuthorizationHandler, FeatureAuthorizationHandler>();
+
 // Who may do what. Declared as policies so the rule lives here rather than as
 // role-name strings sprinkled through the controllers.
 builder.Services.AddAuthorization(options =>
@@ -51,6 +60,18 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy(Policies.ManageCustomers, p => p.RequireRole(Roles.Admin, Roles.Manager));
     options.AddPolicy(Policies.ViewCustomers, p => p.RequireRole(Roles.Admin, Roles.Manager, Roles.Technician));
     options.AddPolicy(Policies.ManageAppointments, p => p.RequireRole(Roles.Admin, Roles.Manager, Roles.Technician));
+    options.AddPolicy(Policies.ManageShopSettings, p => p.RequireRole(Roles.Admin, Roles.Manager));
+
+    // Tier-gated areas. These combine a role check with a licensing check, so a
+    // feature the shop hasn't bought is unreachable rather than merely hidden.
+    // Nothing uses these yet — they're the socket the paid tiers plug into.
+    options.AddPolicy(FeaturePolicies.Invoicing, p => p
+        .RequireRole(Roles.Admin, Roles.Manager)
+        .AddRequirements(new FeatureRequirement(Feature.Invoicing)));
+
+    options.AddPolicy(FeaturePolicies.Inspections, p => p
+        .RequireRole(Roles.Admin, Roles.Manager, Roles.Technician)
+        .AddRequirements(new FeatureRequirement(Feature.DigitalInspections)));
 });
 
 // The public booking form is an anonymous POST that writes to the database, so
@@ -94,33 +115,21 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILoginAuditRepository, LoginAuditRepository>();
 builder.Services.AddScoped<IBookingRequestRepository, BookingRequestRepository>();
-
-// How the shop actually runs: how many jobs at once, and when the doors are
-// open. Both feed the booking rules.
-builder.Services.AddSingleton<IShopSettings>(new ShopSettings(
-    bayCount: builder.Configuration.GetValue("ShopSettings:BayCount", 3),
-    opensAt: TimeOnly.Parse(builder.Configuration["ShopSettings:OpensAt"] ?? "08:00"),
-    closesAt: TimeOnly.Parse(builder.Configuration["ShopSettings:ClosesAt"] ?? "17:00"),
-    closedDays: (builder.Configuration.GetSection("ShopSettings:ClosedDays").Get<string[]>()
-                 ?? new[] { "Sunday" })
-                .Select(Enum.Parse<DayOfWeek>)
-                .ToArray()));
+builder.Services.AddScoped<IShopRepository, ShopRepository>();
 
 // Shop clock. Appointment times are wall-clock times at the shop, so the logic
 // layer needs the shop's timezone rather than the server's — hosted on a UTC
 // machine, DateTime.Now would reject same-day bookings as being in the past.
 // A bad timezone id fails loudly at startup, which beats silently wrong times.
 builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddSingleton<IShopClock>(sp => new ShopClock(
-    sp.GetRequiredService<TimeProvider>(),
-    TimeZoneInfo.FindSystemTimeZoneById(
-        builder.Configuration["ShopSettings:TimeZoneId"] ?? "America/Chicago")));
+builder.Services.AddSingleton<IShopClock, ShopClockFromContext>();
 
 // Logic layer (business rules) — bind interface to implementation.
 builder.Services.AddScoped<IAppointmentLogic, AppointmentLogic>();
 builder.Services.AddScoped<IUserLogic, UserLogic>();
 builder.Services.AddScoped<IBookingRequestLogic, BookingRequestLogic>();
 builder.Services.AddScoped<IServiceLogic, ServiceLogic>();
+builder.Services.AddScoped<IShopLogic, ShopLogic>();
 
 var app = builder.Build();
 

@@ -1,8 +1,8 @@
 using Gregs_Auto.Domain.EntityModels;
-using Gregs_Auto.Domain.Implementations.Interfaces;
+using Gregs_Auto.Domain.Shared;
 using Gregs_Auto.Domain.IRepositories;
 
-namespace Gregs_Auto.Domain.Implementations;
+namespace Gregs_Auto.Domain.Scheduling;
 
 // Business logic for scheduling. Lives in the Domain; depends only on
 // repository interfaces (DI supplies the real ones at runtime).

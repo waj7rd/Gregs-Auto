@@ -1,4 +1,4 @@
-namespace Gregs_Auto.Domain.Implementations.Interfaces;
+namespace Gregs_Auto.Domain.Identity;
 
 // Outcome of a staff-account change. Mirrors AppointmentResult so the
 // controllers all read the same way.

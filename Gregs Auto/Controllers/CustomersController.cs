@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Gregs_Auto.Domain.EntityModels;
 using Gregs_Auto.Domain.IRepositories;
-using Gregs_Auto.Domain.Security;
 using Gregs_Auto.ViewModels;
 
 namespace Gregs_Auto.Controllers;

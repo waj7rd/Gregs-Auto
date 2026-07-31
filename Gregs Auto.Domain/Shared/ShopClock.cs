@@ -1,6 +1,5 @@
-using Gregs_Auto.Domain.Implementations.Interfaces;
 
-namespace Gregs_Auto.Domain.Implementations;
+namespace Gregs_Auto.Domain.Shared;
 
 // Shop-local clock backed by TimeProvider, so tests can hand it a fixed "now"
 // instead of depending on when they happen to run.

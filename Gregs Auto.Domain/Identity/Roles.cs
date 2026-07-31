@@ -1,4 +1,4 @@
-namespace Gregs_Auto.Domain.Security;
+namespace Gregs_Auto.Domain.Identity;
 
 // The staff role vocabulary. These strings go into the Role column and into the
 // role claim, so they have to agree with Users.Role in the database.
@@ -34,4 +34,9 @@ public static class Policies
 
     // Move appointments through their statuses.
     public const string ManageAppointments = "ManageAppointments";
+
+    // Change how the shop runs: hours, bays, timezone, contact details.
+    // Deliberately not the same as ManageStaff — this is operational, not
+    // administrative, and a manager should be able to change Saturday hours.
+    public const string ManageShopSettings = "ManageShopSettings";
 }

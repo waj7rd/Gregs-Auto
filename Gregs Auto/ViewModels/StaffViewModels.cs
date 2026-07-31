@@ -40,7 +40,7 @@ public class CreateStaffViewModel
     public string Email { get; set; } = string.Empty;
 
     [Required]
-    public string Role { get; set; } = Gregs_Auto.Domain.Security.Roles.Technician;
+    public string Role { get; set; } = Gregs_Auto.Domain.Identity.Roles.Technician;
 
     [Required(ErrorMessage = "Set a starting password.")]
     [StringLength(100, MinimumLength = 10, ErrorMessage = "Use at least 10 characters.")]

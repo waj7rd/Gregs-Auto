@@ -1,4 +1,4 @@
-namespace Gregs_Auto.Domain.Implementations.Interfaces;
+namespace Gregs_Auto.Domain.Shared;
 
 // Facts about how this particular shop runs, supplied from configuration.
 // Behind an interface so the Domain doesn't take a dependency on

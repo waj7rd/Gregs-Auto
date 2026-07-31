@@ -1,6 +1,4 @@
 using Gregs_Auto.Domain.EntityModels;
-using Gregs_Auto.Domain.Implementations;
-using Gregs_Auto.Domain.Implementations.Interfaces;
 using Gregs_Auto.Tests.Fakes;
 
 namespace Gregs_Auto.Tests;
