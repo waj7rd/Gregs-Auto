@@ -7,4 +7,6 @@ namespace Gregs_Auto.DAL.Repositories;
 
 public class ServiceRepository : GenericRepository<GregsAutoContext, Service>, IServiceRepository
 {
+    public ServiceRepository(GregsAutoContext context) : base(context) { }
+
 }

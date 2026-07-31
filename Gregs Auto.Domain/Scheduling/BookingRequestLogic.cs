@@ -13,6 +13,7 @@ public class BookingRequestLogic : IBookingRequestLogic
     private readonly IAppointmentLogic _appointmentLogic;
     private readonly IShopClock _clock;
     private readonly IShopSettings _settings;
+    private readonly IUnitOfWork _unitOfWork;
 
     public BookingRequestLogic(
         IBookingRequestRepository requestRepository,
@@ -21,7 +22,8 @@ public class BookingRequestLogic : IBookingRequestLogic
         IServiceRepository serviceRepository,
         IAppointmentLogic appointmentLogic,
         IShopClock clock,
-        IShopSettings settings)
+        IShopSettings settings,
+        IUnitOfWork unitOfWork)
     {
         _requestRepository = requestRepository;
         _customerRepository = customerRepository;
@@ -30,6 +32,7 @@ public class BookingRequestLogic : IBookingRequestLogic
         _appointmentLogic = appointmentLogic;
         _clock = clock;
         _settings = settings;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<BookingRequestResult> SubmitAsync(NewBookingRequest request)
@@ -72,7 +75,13 @@ public class BookingRequestLogic : IBookingRequestLogic
     public async Task<IList<BookingRequest>> GetRecentlyHandledAsync(int count) =>
         await _requestRepository.GetRecentAsync(count);
 
-    public async Task<BookingRequestResult> AcceptAsync(int bookingRequestId, int handledByUserId)
+    // All-or-nothing. Without the transaction, a request refused at the booking
+    // step — no free bay, outside opening hours — still leaves the customer and
+    // vehicle it created on file, from a request nobody accepted.
+    public async Task<BookingRequestResult> AcceptAsync(int bookingRequestId, int handledByUserId) =>
+        await _unitOfWork.ExecuteAsync(() => AcceptCoreAsync(bookingRequestId, handledByUserId));
+
+    private async Task<BookingRequestResult> AcceptCoreAsync(int bookingRequestId, int handledByUserId)
     {
         var request = await _requestRepository.GetWithDetailsAsync(bookingRequestId);
         if (request == null)

@@ -50,3 +50,28 @@ public class TestShopSettings : IShopSettings
     public TimeOnly ClosesAt { get; }
     public IReadOnlyCollection<DayOfWeek> ClosedDays { get; }
 }
+
+// Runs the operation straight through. In-memory fakes have nothing to roll
+// back, so this cannot prove rollback — it records whether the Unit of Work
+// WOULD have rolled back, which is the part the logic layer controls. Actual
+// rollback is SQL Server's job and is verified against the real database.
+public class TestUnitOfWork : IUnitOfWork
+{
+    public int Executions { get; private set; }
+    public bool? LastWouldRollBack { get; private set; }
+
+    public async Task<T> ExecuteAsync<T>(Func<Task<T>> operation)
+    {
+        Executions++;
+        var result = await operation();
+        LastWouldRollBack = result is IOperationResult { Success: false };
+        return result;
+    }
+
+    public async Task ExecuteAsync(Func<Task> operation)
+    {
+        Executions++;
+        await operation();
+        LastWouldRollBack = false;
+    }
+}

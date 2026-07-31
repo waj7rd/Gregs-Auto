@@ -8,6 +8,8 @@ namespace Gregs_Auto.DAL.Repositories;
 
 public class AppointmentRepository : GenericRepository<GregsAutoContext, Appointment>, IAppointmentRepository
 {
+    public AppointmentRepository(GregsAutoContext context) : base(context) { }
+
     // Entity-specific query. EF Core's Include lives HERE, in the DAL — never
     // in the Domain. Uses Context (the DbContext) from the generic base class.
     public async Task<IList<Appointment>> GetAllWithDetailsAsync()

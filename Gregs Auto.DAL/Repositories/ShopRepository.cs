@@ -8,6 +8,8 @@ namespace Gregs_Auto.DAL.Repositories;
 
 public class ShopRepository : GenericRepository<GregsAutoContext, Shop>, IShopRepository
 {
+    public ShopRepository(GregsAutoContext context) : base(context) { }
+
     public async Task<Shop?> GetCurrentAsync()
     {
         return await Context.Shops.OrderBy(s => s.ShopId).FirstOrDefaultAsync();

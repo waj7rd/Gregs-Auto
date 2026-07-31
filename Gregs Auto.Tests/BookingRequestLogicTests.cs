@@ -14,6 +14,7 @@ public class BookingRequestLogicTests
     private readonly FakeServiceRepository _services = new();
     private readonly FakeAppointmentRepository _appointments = new();
     private readonly TestClock _clock = new();
+    private readonly TestUnitOfWork _unitOfWork = new();
 
     public BookingRequestLogicTests()
     {
@@ -32,7 +33,7 @@ public class BookingRequestLogicTests
             _appointments, _vehicles, _services, _clock, settings);
 
         return new BookingRequestLogic(
-            _requests, _customers, _vehicles, _services, appointmentLogic, _clock, settings);
+            _requests, _customers, _vehicles, _services, appointmentLogic, _clock, settings, _unitOfWork);
     }
 
     private static DateTime Tomorrow(int hour) => new DateTime(2026, 7, 16, hour, 0, 0);
@@ -246,5 +247,55 @@ public class BookingRequestLogicTests
 
         Assert.Empty(await Logic().GetPendingAsync());
         Assert.Single(await Logic().GetRecentlyHandledAsync(10));
+    }
+
+    // ---------- transactional behaviour ----------
+
+    [Fact]
+    public async Task Accepting_runs_inside_a_unit_of_work()
+    {
+        await Logic().SubmitAsync(Request());
+
+        await Logic().AcceptAsync(_requests.All[0].BookingRequestId, StaffUserId);
+
+        Assert.Equal(1, _unitOfWork.Executions);
+    }
+
+    [Fact]
+    public async Task A_refused_accept_is_marked_for_rollback()
+    {
+        // Fill the bays so the booking step refuses after the customer and
+        // vehicle have been created. Against a real database the transaction
+        // rolls back and neither row survives; here we assert the logic layer
+        // signalled that it should.
+        for (var i = 1; i <= 3; i++)
+        {
+            _vehicles.Seed(new Vehicle { VehicleId = 200 + i });
+            _appointments.Seed(new Appointment
+            {
+                VehicleId = 200 + i,
+                ServiceId = OilChangeId,
+                ScheduledAt = Tomorrow(10),
+                Status = AppointmentStatus.Scheduled,
+                Service = _services.GetAll().First()
+            });
+        }
+
+        await Logic().SubmitAsync(Request());
+        var result = await Logic().AcceptAsync(_requests.All[0].BookingRequestId, StaffUserId);
+
+        Assert.False(result.Success);
+        Assert.True(_unitOfWork.LastWouldRollBack);
+    }
+
+    [Fact]
+    public async Task A_successful_accept_is_not_marked_for_rollback()
+    {
+        await Logic().SubmitAsync(Request());
+
+        var result = await Logic().AcceptAsync(_requests.All[0].BookingRequestId, StaffUserId);
+
+        Assert.True(result.Success, result.ErrorMessage);
+        Assert.False(_unitOfWork.LastWouldRollBack);
     }
 }

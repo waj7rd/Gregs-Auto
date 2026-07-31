@@ -74,11 +74,23 @@ record still has a valid id and a stale form will happily post one.
 
 ---
 
+## ⚠️ `ShopId` defaults are a stopgap
+
+`FixShopIdDefaults.sql` puts a `DEFAULT (1)` on every non-nullable `ShopId`,
+because the columns were added `NOT NULL` and nothing in the code sets them —
+which broke every insert until the default was added.
+
+**Remove those defaults when tenant resolution lands.** At that point `ShopId`
+has to be set explicitly from the request's tenant. A silent default would be
+worse than a failure: it would quietly file one shop's data under another.
+
 ## Known gaps
 
-**No Unit of Work.** `BookingRequestLogic.AcceptAsync` calls `SaveChangesAsync`
-five times with no transaction. Fail between two and you get a customer with no
-appointment. Tolerable for scheduling; unacceptable once money is involved.
+**One DbContext per request, and it matters.** `GenericRepository` used to do
+`new C()`, giving every repository its own context on its own connection. That
+made `IUnitOfWork` silently useless — it opened a transaction on a context
+nobody else wrote through, so nothing rolled back. The context is injected now.
+Do not reintroduce `new` there.
 
 **Prices are not snapshotted.** `Appointment` reads its price from `Service`, so
 changing a price silently restates what past jobs appear to have cost. Harmless

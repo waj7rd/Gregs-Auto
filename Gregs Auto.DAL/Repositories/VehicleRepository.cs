@@ -8,6 +8,8 @@ namespace Gregs_Auto.DAL.Repositories;
 
 public class VehicleRepository : GenericRepository<GregsAutoContext, Vehicle>, IVehicleRepository
 {
+    public VehicleRepository(GregsAutoContext context) : base(context) { }
+
     public async Task<IList<Vehicle>> GetAllWithCustomerAsync()
     {
         return await Context.Vehicles

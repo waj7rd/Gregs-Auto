@@ -8,6 +8,8 @@ namespace Gregs_Auto.DAL.Repositories;
 
 public class BookingRequestRepository : GenericRepository<GregsAutoContext, BookingRequest>, IBookingRequestRepository
 {
+    public BookingRequestRepository(GregsAutoContext context) : base(context) { }
+
     public async Task<IList<BookingRequest>> GetPendingAsync()
     {
         return await Context.BookingRequests

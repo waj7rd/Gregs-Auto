@@ -7,4 +7,6 @@ namespace Gregs_Auto.DAL.Repositories;
 
 public class UserRepository : GenericRepository<GregsAutoContext, User>, IUserRepository
 {
+    public UserRepository(GregsAutoContext context) : base(context) { }
+
 }

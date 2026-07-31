@@ -1,3 +1,4 @@
+using Gregs_Auto.Domain.Shared;
 using Gregs_Auto.Domain.EntityModels;
 
 namespace Gregs_Auto.Domain.Catalog;
@@ -24,7 +25,7 @@ public interface IServiceLogic
     Task<ServiceResult> SetActiveAsync(int serviceId, bool isActive);
 }
 
-public class ServiceResult
+public class ServiceResult : IOperationResult
 {
     public bool Success { get; private set; }
     public string? ErrorMessage { get; private set; }

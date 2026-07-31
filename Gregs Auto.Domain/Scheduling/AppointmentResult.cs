@@ -1,8 +1,9 @@
+using Gregs_Auto.Domain.Shared;
 namespace Gregs_Auto.Domain.Scheduling;
 
 // The outcome of a booking attempt. A customer needs to know WHY a booking
 // failed (bad vehicle/service, slot already taken, etc.) so the UI can show it.
-public class AppointmentResult
+public class AppointmentResult : IOperationResult
 {
     public bool Success { get; private set; }
     public string? ErrorMessage { get; private set; }

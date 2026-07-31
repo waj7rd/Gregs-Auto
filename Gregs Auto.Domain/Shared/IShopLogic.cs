@@ -33,7 +33,7 @@ public class ShopSettingsUpdate
     public IReadOnlyCollection<DayOfWeek> ClosedDays { get; set; } = Array.Empty<DayOfWeek>();
 }
 
-public class ShopResult
+public class ShopResult : IOperationResult
 {
     public bool Success { get; private set; }
     public string? ErrorMessage { get; private set; }

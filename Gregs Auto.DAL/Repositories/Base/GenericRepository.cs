@@ -7,16 +7,28 @@ namespace Gregs_Auto.DAL.Repositories.Base;
 
 // The single implementation of IGenericRepository, shared by every entity repo.
 // C is the context type; T is the entity type.
+//
+// The context is injected, not constructed here. It used to be `new C()`, which
+// gave every repository its own context on its own connection — so a request
+// touching customers, vehicles and appointments opened three of them, an entity
+// loaded by one repository was invisible to the others, and no transaction could
+// ever span two repositories. That last one made the Unit of Work silently
+// useless: it opened a transaction on a context nobody else was writing through.
+//
+// With one scoped context per request, SaveChangesAsync on any repository writes
+// through the same connection, and IUnitOfWork can wrap the lot.
 public abstract class GenericRepository<C, T> : IGenericRepository<T>
     where T : class
-    where C : GregsAutoContext, new()
+    where C : GregsAutoContext
 {
-    private C _entities = new();
-    public C Context
+    private readonly C _entities;
+
+    protected GenericRepository(C context)
     {
-        get { return _entities; }
-        set { _entities = value; }
+        _entities = context;
     }
+
+    public C Context => _entities;
 
     #region ASYNCHRONOUS
     public virtual async Task<IList<T>> GetAllAsync()

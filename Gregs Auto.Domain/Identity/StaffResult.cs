@@ -1,8 +1,9 @@
+using Gregs_Auto.Domain.Shared;
 namespace Gregs_Auto.Domain.Identity;
 
 // Outcome of a staff-account change. Mirrors AppointmentResult so the
 // controllers all read the same way.
-public class StaffResult
+public class StaffResult : IOperationResult
 {
     public bool Success { get; private set; }
 

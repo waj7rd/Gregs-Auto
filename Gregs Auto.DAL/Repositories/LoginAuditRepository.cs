@@ -8,6 +8,8 @@ namespace Gregs_Auto.DAL.Repositories;
 
 public class LoginAuditRepository : GenericRepository<GregsAutoContext, LoginAudit>, ILoginAuditRepository
 {
+    public LoginAuditRepository(GregsAutoContext context) : base(context) { }
+
     public async Task<IList<LoginAudit>> GetRecentAsync(int count)
     {
         return await Context.LoginAudits

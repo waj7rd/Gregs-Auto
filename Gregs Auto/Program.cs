@@ -117,6 +117,9 @@ builder.Services.AddScoped<ILoginAuditRepository, LoginAuditRepository>();
 builder.Services.AddScoped<IBookingRequestRepository, BookingRequestRepository>();
 builder.Services.AddScoped<IShopRepository, ShopRepository>();
 
+// One transaction per business operation. See IUnitOfWork.
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 // Shop clock. Appointment times are wall-clock times at the shop, so the logic
 // layer needs the shop's timezone rather than the server's — hosted on a UTC
 // machine, DateTime.Now would reject same-day bookings as being in the past.

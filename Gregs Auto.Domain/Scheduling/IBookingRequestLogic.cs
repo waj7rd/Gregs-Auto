@@ -1,3 +1,4 @@
+using Gregs_Auto.Domain.Shared;
 using Gregs_Auto.Domain.EntityModels;
 
 namespace Gregs_Auto.Domain.Scheduling;
@@ -35,7 +36,7 @@ public class NewBookingRequest
     public string? Notes { get; set; }
 }
 
-public class BookingRequestResult
+public class BookingRequestResult : IOperationResult
 {
     public bool Success { get; private set; }
     public string? ErrorMessage { get; private set; }
