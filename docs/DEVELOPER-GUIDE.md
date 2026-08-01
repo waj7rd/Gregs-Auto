@@ -53,13 +53,24 @@ before it.
 | 10 | `FixShopIdDefaults.sql` | **Required.** Without it every INSERT fails |
 | 11 | `AddAppointmentSnapshot.sql` | Price and duration copied onto each appointment |
 
-Two optional extras:
+Three optional extras, for demos:
 
-- `RefreshDemoData.sql` — re-anchors the sample appointments to today. Run it
-  before a demo so the schedule doesn't look stale.
+- `ResetDemoRequests.sql` — deletes everything outside the base seed. Run it
+  after a rehearsal, before the two below.
 - `SeedBookingRequests.sql` — five pending and two handled requests, so
   `/Appointments/Requests` has something in it. Every pending one is valid
   against the booking rules, so they can all actually be accepted.
+- `RefreshDemoData.sql` — re-anchors the sample appointments to today. Run it
+  the morning of, so the schedule doesn't look stale.
+
+Run them in that order, and run them **on the day**, not the night before —
+`RefreshDemoData` anchors on today's date, and the shop is closed weekends, so
+a Friday run puts the "in the bay right now" job on a Saturday.
+
+Reset first or the demo quietly breaks: `SeedBookingRequests` is idempotent on
+phone number, so a rehearsal that accepted a request leaves that row behind as
+`Accepted` and the re-run inserts nothing. You get an empty queue and no
+pending request to accept — which is the one step worth showing.
 
 ### Run it
 

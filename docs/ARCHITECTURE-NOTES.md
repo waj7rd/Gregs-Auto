@@ -60,20 +60,20 @@ are correct. Just don't mistake their presence for enforcement.
 
 ## Two test suites, and why
 
-**Gregs Auto.Tests** (89) — business rules against in-memory fakes. Fast, no
+**Gregs Auto.Tests** (102) — business rules against in-memory fakes. Fast, no
 database, run constantly.
 
-**Gregs Auto.SmokeTests** (12) — the real application through the real HTTP
+**Gregs Auto.SmokeTests** (14) — the real application through the real HTTP
 stack against a throwaway database built from the migration scripts in
 `Gregs Auto.DAL/Scripts`.
 
 The second exists because the first is structurally blind to a whole class of
 failure. A migration once added `ShopId` as NOT NULL with no default and
-nothing set it, so every INSERT in the application failed — and all 89 unit
-tests stayed green, because none of them touch a database.
+nothing set it, so every INSERT in the application failed — and every unit
+test stayed green, because none of them touch a database.
 
-Verified by reintroducing that exact bug: unit tests 89/89 green, smoke tests
-caught it on both insert paths immediately.
+Verified by reintroducing that exact bug: the whole unit suite green, smoke
+tests caught it on both insert paths immediately.
 
 Run them after any schema change. They need SQL Server and the gitignored
 scripts, so they cannot run on a fresh clone.

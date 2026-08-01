@@ -24,8 +24,8 @@ gave you the repo.
 ## Tests
 
 ```
-dotnet test "Gregs Auto.Tests"        # 89 — business rules, no database
-dotnet test "Gregs Auto.SmokeTests"   # 12 — real app, real database
+dotnet test "Gregs Auto.Tests"        # 102 — business rules, no database
+dotnet test "Gregs Auto.SmokeTests"   # 14 — real app, real database
 ```
 
 Run the smoke tests after any schema change. The unit suite cannot see a broken
