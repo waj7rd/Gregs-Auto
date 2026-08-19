@@ -3,6 +3,28 @@
     var action = ViewContext.RouteData.Values["action"]?.ToString();
     string NavClass(string c, string? a = null) =>
         controller == c && (a == null || action == a) ? "nav-link active" : "nav-link";
+
+    // Replace YOUR-DOMAIN.com with the live domain before launch.
+    const string SiteDomain = "https://YOUR-DOMAIN.com";
+
+    var metaDesc = ViewData["MetaDescription"] as string
+        ?? "Greg's Automotive in Troy, MO — honest repairs and fair prices. Oil changes, brakes, tires, diagnostics, and more. Book online in under a minute.";
+
+    var canonicalUrl = SiteDomain + Context.Request.Path;
+    var ogTitle     = (ViewData["Title"] as string ?? "Greg's Automotive") + " · Greg's Automotive";
+
+    // Staff screens and thin confirmation pages shouldn't earn a search result.
+    // Kept in step with wwwroot/robots.txt: that file asks crawlers not to fetch
+    // these, this covers the ones they reach from a link anyway. A view can force
+    // the decision either way with ViewData["NoIndex"].
+    var noIndex = ViewData["NoIndex"] as bool? ?? (controller, action) switch
+    {
+        ("Account", _) or ("Customers", _) or ("Settings", _) or ("Staff", _) => true,
+        ("Appointments", "Manage") or ("Appointments", "Requests") or ("Appointments", "Requested") => true,
+        ("Services", "Manage") or ("Services", "Create") or ("Services", "Edit") => true,
+        ("Home", "Error") => true,
+        _ => false
+    };
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -10,6 +32,55 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] &middot; Greg's Automotive</title>
+    @if (noIndex)
+    {
+        <meta name="robots" content="noindex, follow" />
+    }
+
+    <!-- SEO: description & canonical -->
+    <meta name="description" content="@metaDesc" />
+    <link rel="canonical" href="@canonicalUrl" />
+
+    <!-- Open Graph -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:site_name"   content="Greg's Automotive" />
+    <meta property="og:title"       content="@ogTitle" />
+    <meta property="og:description" content="@metaDesc" />
+    <meta property="og:url"         content="@canonicalUrl" />
+    <meta property="og:image"       content="@(SiteDomain)/images/og-image.jpg" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card"        content="summary" />
+    <meta name="twitter:title"       content="@ogTitle" />
+    <meta name="twitter:description" content="@metaDesc" />
+
+    @* JSON-LD lives in the markup rather than a C# string: Razor's tokenizer
+       rejects raw string literals ("""), and verbatim strings would mean
+       doubling every quote in the JSON. In markup, @@ escapes a literal @,
+       and the url below reuses the same SiteDomain as the canonical tag. *@
+    <script type="application/ld+json">
+        {
+          "@@context": "https://schema.org",
+          "@@type": "AutoRepair",
+          "name": "Greg's Automotive",
+          "description": "Honest auto repair in Troy, MO. Oil changes, brakes, tires, diagnostics, alignments, and more.",
+          "url": "@SiteDomain",
+          "telephone": "+16365288204",
+          "address": {
+            "@@type": "PostalAddress",
+            "streetAddress": "396 Travis Blvd",
+            "addressLocality": "Troy",
+            "addressRegion": "MO",
+            "postalCode": "63379",
+            "addressCountry": "US"
+          },
+          "priceRange": "$$",
+          "sameAs": [
+            "https://YOUR-GOOGLE-BUSINESS-PROFILE-URL"
+          ]
+        }
+    </script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
