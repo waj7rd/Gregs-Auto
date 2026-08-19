@@ -1,0 +1,18 @@
+User-agent: *
+
+# Block staff-only and internal routes from indexing.
+# Kept in step with the noIndex switch in Views/Shared/_Layout.cshtml — change
+# one and change the other, or a page ends up blocked here and indexable there.
+Disallow: /Account/
+Disallow: /Appointments/Manage
+Disallow: /Appointments/Requests
+Disallow: /Appointments/Requested
+Disallow: /Customers/
+Disallow: /Services/Manage
+Disallow: /Services/Create
+Disallow: /Services/Edit
+Disallow: /Settings/
+Disallow: /Staff/
+
+# Replace YOUR-DOMAIN.com before launch
+Sitemap: https://YOUR-DOMAIN.com/sitemap.xml
